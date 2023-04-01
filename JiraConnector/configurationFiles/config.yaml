@@ -1,0 +1,13 @@
+DBSettings:
+  username: pguser
+  password: pgpwd
+  hostname: localhost
+  port: 5432
+  name: postgres
+ProgramSettings:
+  local_http_server_port: 8081
+  jiraUrl: https://issues.apache.org/jira/
+  issueInOneRequest: 100
+  threadCount: 5
+  maxTimeSleep: 8000
+  minTimeSleep: 50
