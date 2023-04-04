@@ -1,0 +1,30 @@
+version: "3.7"
+
+services:
+  db:
+    environment:
+      POSTGRES_DB: testdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432"
+    volumes: 
+      - db-data:/var/lib/postgresql/data
+    build: Database_image/
+
+  pgadmin:
+    image: dpage/pgadmin4:5.7
+    restart: always
+    environment: 
+      PGADMIN_DEFAULT_EMAIL: pguser@mail.ru
+      PGADMIN_DEFAULT_PASSWORD: pgadmin
+      PGADMIN_LISTEN_PORT: 5050
+    ports:
+      - "5050"
+    volumes: 
+      - pgadmin-data:/var/lib/pgadmin
+    links:
+      - "db:dbServer"
+volumes:
+  db-data:
+  pgadmin-data:

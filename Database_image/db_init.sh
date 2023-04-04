@@ -1,0 +1,1 @@
+psql -U postgres --dbname=testdb --file=/docker-entrypoint-initdb.d/cmd1.txt
