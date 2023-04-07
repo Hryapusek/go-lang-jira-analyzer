@@ -16,7 +16,7 @@ import (
 type route struct {
 	prefix  string
 	target  *url.URL
-	timeout time.Duration // Добавьте поле для установки времени ожидания
+	timeout time.Duration // время ожидания
 }
 
 func main() {
@@ -46,7 +46,7 @@ func main() {
 	routes := []route{
 		{cfg.AnalyticsAPIPrefix, analyticsTarget, time.Duration(cfg.AnalyticsTimeout) * time.Second},
 		{cfg.ResourceAPIPrefix, resourceTarget, time.Duration(cfg.ResourceTimeout) * time.Second},
-		{cfg.ConnectorAPIPrefix, connectorTarget, 0}, // Убираем временной лимит для микросервиса connector
+		{cfg.ConnectorAPIPrefix, connectorTarget, 0}, // микросервис connector без лимита
 	}
 
 	mux := http.NewServeMux()
