@@ -121,3 +121,20 @@
 {"level":"info","msg":"Starting server...","time":"2023-04-24T14:50:26+03:00"}
 {"level":"info","msg":"Starting server...","time":"2023-04-24T14:53:19+03:00"}
 {"level":"info","msg":"Starting server...","time":"2023-04-24T14:53:42+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T15:20:15+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T17:21:57+03:00"}
+{"level":"error","msg":"Incorrect http method for /projects","time":"2023-04-24T17:22:20+03:00"}
+{"level":"error","msg":"Incorrect http method for /projects","time":"2023-04-24T17:22:29+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T17:23:47+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T17:26:31+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T17:39:56+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T17:41:43+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T17:42:04+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T17:45:52+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T17:49:32+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T17:49:53+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T17:57:28+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T18:02:27+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T18:03:39+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T18:06:33+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T18:08:25+03:00"}

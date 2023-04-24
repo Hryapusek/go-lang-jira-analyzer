@@ -6,6 +6,7 @@ import (
 	"JiraConnector/dataTransformer"
 	"JiraConnector/dbPusher"
 	"JiraConnector/logging"
+	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
@@ -46,8 +47,8 @@ func (server *Server) updateProject(writer http.ResponseWriter, request *http.Re
 		return
 	}
 
-	issues := server.connector.GetProjectIssues(projectName, server.configReader.GetMinTimeSleep())
-	if issues != nil {
+	issues, err := server.connector.GetProjectIssues(projectName, server.configReader.GetMinTimeSleep())
+	if err == nil {
 		transformedIssues := server.dataTransformer.TransformIssues(issues)
 		server.databasePusher.PushIssues(transformedIssues)
 	} else {
@@ -63,7 +64,40 @@ func (server *Server) projects(writer http.ResponseWriter, request *http.Request
 		return
 	}
 
+	limit, page, search := extractProjectParameters(request)
+
 	writer.Header().Set("Content-Type", "application/json")
+	projects, err := server.connector.GetProjects(limit, page, search)
+	if err != nil {
+		server.logger.Log(logging.ERROR, "Error while downloading list of projects")
+		writer.WriteHeader(400)
+		return
+	}
+	response, _ := json.Marshal(projects)
+	_, _ = writer.Write(response)
+}
+
+func extractProjectParameters(request *http.Request) (int, int, string) {
+	limit := 20
+	page := 1
+	search := ""
+
+	limitParam := request.URL.Query().Get("limit")
+	if len(limitParam) != 0 {
+		limit, _ = strconv.Atoi(limitParam)
+	}
+
+	pageParam := request.URL.Query().Get("page")
+	if len(pageParam) != 0 {
+		page, _ = strconv.Atoi(pageParam)
+	}
+
+	searchParam := request.URL.Query().Get("search")
+	if len(searchParam) != 0 {
+		search = searchParam
+	}
+
+	return limit, page, search
 }
 
 func (server *Server) routes() {
