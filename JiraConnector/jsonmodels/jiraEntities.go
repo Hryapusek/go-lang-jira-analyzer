@@ -14,23 +14,24 @@ type IssueFields struct {
 	Summary string `json:"summary"`
 	Type    struct {
 		Name string `json:"name"`
-		Id   string `json:"id"`
 	} `json:"issuetype"`
 	Status struct {
 		Name string `json:"name"`
-		Id   string `json:"id"`
 	} `json:"status"`
 	Priority struct {
 		Name string `json:"name"`
-		Id   string `json:"id"`
 	} `json:"priority"`
 	Creator struct {
-		Key         string `json:"key"`
-		Name        string `json:"name"`
-		DisplayName string `json:"displayName"`
+		Name string `json:"name"`
 	} `json:"creator"`
 	Project struct {
-		Key  string `json:"key"`
 		Name string `json:"name"`
 	} `json:"project"`
+	Description  string `json:"description"`
+	AssigneeName struct {
+		Name string `json:"name"`
+	} `json:"assignee"`
+	CreatedTime string `json:"created"`
+	UpdatedTime string `json:"updated"`
+	ClosedTime  string `json:"resolutiondate"`
 }

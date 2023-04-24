@@ -3,6 +3,8 @@ package apiServer
 import (
 	"JiraConnector/configReader"
 	"JiraConnector/connector"
+	"JiraConnector/dataTransformer"
+	"JiraConnector/dbPusher"
 	"JiraConnector/logging"
 	"log"
 	"net/http"
@@ -10,19 +12,23 @@ import (
 )
 
 type Server struct {
-	configReader *configReader.ConfigReader
-	config       *ServerConfig
-	logger       *logging.Logger
-	connector    *connector.JiraConnector
+	configReader    *configReader.ConfigReader
+	config          *ServerConfig
+	logger          *logging.Logger
+	connector       *connector.JiraConnector
+	dataTransformer *dataTransformer.DataTransformer
+	databasePusher  *dbPusher.DatabasePusher
 }
 
 func NewServer() *Server {
 	reader := configReader.NewConfigReader()
 	return &Server{
-		configReader: reader,
-		config:       NewServerConfig(reader.GetLocalServerPort()),
-		logger:       logging.NewLogger(),
-		connector:    connector.NewJiraConnector(),
+		configReader:    reader,
+		config:          NewServerConfig(reader.GetLocalServerPort()),
+		logger:          logging.NewLogger(),
+		connector:       connector.NewJiraConnector(),
+		dataTransformer: dataTransformer.NewDataTransformer(),
+		databasePusher:  dbPusher.NewDatabasePusher(),
 	}
 }
 
@@ -40,7 +46,14 @@ func (server *Server) updateProject(writer http.ResponseWriter, request *http.Re
 		return
 	}
 
-	server.connector.GetProjectIssues(projectName, 0)
+	issues := server.connector.GetProjectIssues(projectName, server.configReader.GetMinTimeSleep())
+	if issues != nil {
+		transformedIssues := server.dataTransformer.TransformIssues(issues)
+		server.databasePusher.PushIssues(transformedIssues)
+	} else {
+		server.logger.Log(logging.ERROR, "Error while downloading issues for project \""+projectName+"\"")
+		writer.WriteHeader(400)
+	}
 }
 
 func (server *Server) projects(writer http.ResponseWriter, request *http.Request) {

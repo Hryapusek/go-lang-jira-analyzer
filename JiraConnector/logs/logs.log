@@ -1,3 +1,123 @@
 {"level":"info","msg":"Starting server...","time":"2023-03-21T18:52:29+03:00"}
 {"level":"info","msg":"Starting server...","time":"2023-04-01T15:51:11+03:00"}
 {"level":"info","msg":"Starting server...","time":"2023-04-01T15:53:57+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-02T16:54:35+03:00"}
+{"level":"error","msg":"Incorrect http method for /updateProject","time":"2023-04-02T16:55:21+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-02T16:57:04+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-02T16:58:53+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-02T17:00:03+03:00"}
+{"level":"error","msg":"parse \"https://issues.apa che.org/jira/rest/api/2/search?jql=project=\\\"aardvark\\\"\u0026expand=changelog\u0026startAt=0\u0026maxResults=100\": invalid character \" \" in host name","time":"2023-04-02T17:00:09+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-02T17:00:24+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-02T17:03:03+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-02T17:03:37+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-02T17:35:28+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-02T17:39:50+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-02T17:48:16+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-02T17:48:56+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-22T16:59:15+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-22T17:08:59+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-22T18:35:03+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-22T18:49:23+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-22T18:50:57+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-22T18:51:59+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-22T18:52:16+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-22T18:54:19+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-22T18:55:14+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-22T18:56:39+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-22T18:57:31+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-22T18:59:01+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-22T19:13:09+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-22T19:13:39+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-22T19:16:03+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-22T19:22:14+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-22T19:23:37+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-22T19:25:41+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T09:07:14+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T09:08:15+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T09:10:00+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T09:14:53+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T09:16:36+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T09:18:41+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T09:20:06+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T09:21:05+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T09:45:06+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T09:47:27+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T09:48:41+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T09:49:18+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T09:50:33+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T09:52:39+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T09:54:00+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T09:54:38+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T09:55:49+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T09:59:30+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T09:59:57+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T12:21:36+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T21:16:13+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T21:20:16+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T21:46:31+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T21:47:54+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T21:51:17+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T21:53:52+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T21:55:37+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-23T21:56:19+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T09:12:11+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T09:27:09+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T09:31:46+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T09:34:29+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T09:42:53+03:00"}
+{"level":"error","msg":"Can not open connection to database","time":"2023-04-24T09:43:00+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T09:43:23+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T09:45:21+03:00"}
+{"level":"error","msg":"Unable to get issues for project rrrrrrrrrrrrrrrrrr","time":"2023-04-24T09:45:26+03:00"}
+{"level":"error","msg":"Error while downloading issues for project \"rrrrrrrrrrrrrrrrrr\"","time":"2023-04-24T09:45:26+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:18:58+03:00"}
+{"level":"error","msg":"Unable to get issues for project Addressing","time":"2023-04-24T14:19:03+03:00"}
+{"level":"error","msg":"Error while downloading issues for project \"Addressing\"","time":"2023-04-24T14:19:03+03:00"}
+{"level":"error","msg":"Unable to get issues for project aardvark","time":"2023-04-24T14:19:32+03:00"}
+{"level":"error","msg":"Error while downloading issues for project \"aardvark\"","time":"2023-04-24T14:19:32+03:00"}
+{"level":"error","msg":"Unable to get issues for project Addressing","time":"2023-04-24T14:20:12+03:00"}
+{"level":"error","msg":"Error while downloading issues for project \"Addressing\"","time":"2023-04-24T14:20:12+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:21:30+03:00"}
+{"level":"error","msg":"Unable to get issues for project Addressing","time":"2023-04-24T14:21:35+03:00"}
+{"level":"error","msg":"Error while downloading issues for project \"Addressing\"","time":"2023-04-24T14:21:35+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:22:19+03:00"}
+{"level":"error","msg":"Unable to get issues for project Addressing","time":"2023-04-24T14:22:22+03:00"}
+{"level":"error","msg":"Error while downloading issues for project \"Addressing\"","time":"2023-04-24T14:22:22+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:22:43+03:00"}
+{"level":"error","msg":"Unable to get issues for project Addressing","time":"2023-04-24T14:22:46+03:00"}
+{"level":"error","msg":"Error while downloading issues for project \"Addressing\"","time":"2023-04-24T14:22:46+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:23:09+03:00"}
+{"level":"error","msg":"Unable to get issues for project Addressing","time":"2023-04-24T14:23:12+03:00"}
+{"level":"error","msg":"Error while downloading issues for project \"Addressing\"","time":"2023-04-24T14:23:12+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:23:33+03:00"}
+{"level":"error","msg":"Unable to get issues for project Addressing","time":"2023-04-24T14:23:36+03:00"}
+{"level":"error","msg":"Error while downloading issues for project \"Addressing\"","time":"2023-04-24T14:23:36+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:24:03+03:00"}
+{"level":"error","msg":"Unable to get issues for project Addressing","time":"2023-04-24T14:24:07+03:00"}
+{"level":"error","msg":"Error while downloading issues for project \"Addressing\"","time":"2023-04-24T14:24:07+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:25:01+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:25:47+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:26:22+03:00"}
+{"level":"error","msg":"Unable to get issues for project Aci","time":"2023-04-24T14:26:34+03:00"}
+{"level":"error","msg":"Error while downloading issues for project \"Aci\"","time":"2023-04-24T14:26:34+03:00"}
+{"level":"error","msg":"Unable to get issues for project Aci","time":"2023-04-24T14:26:44+03:00"}
+{"level":"error","msg":"Error while downloading issues for project \"Aci\"","time":"2023-04-24T14:26:44+03:00"}
+{"level":"error","msg":"Unable to get issues for project Aci","time":"2023-04-24T14:26:46+03:00"}
+{"level":"error","msg":"Error while downloading issues for project \"Aci\"","time":"2023-04-24T14:26:46+03:00"}
+{"level":"error","msg":"Unable to get issues for project Aci","time":"2023-04-24T14:26:47+03:00"}
+{"level":"error","msg":"Error while downloading issues for project \"Aci\"","time":"2023-04-24T14:26:47+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:32:14+03:00"}
+{"level":"error","msg":"Can not open connection to database","time":"2023-04-24T14:32:28+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:33:20+03:00"}
+{"level":"error","msg":"Can not open connection to databasesql: unknown driver \"postgres\" (forgotten import?)","time":"2023-04-24T14:33:25+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:34:03+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:40:26+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:41:53+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:42:38+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:43:35+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:45:34+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:48:02+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:48:28+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:50:26+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:53:19+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-24T14:53:42+03:00"}
