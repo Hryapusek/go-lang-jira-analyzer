@@ -31,3 +31,5 @@
 {"level":"error","msg":"Error while downloading issues for project \"Aci\"","time":"2023-04-24T14:26:47+03:00"}
 {"level":"error","msg":"Can not open connection to database","time":"2023-04-24T14:32:28+03:00"}
 {"level":"error","msg":"Can not open connection to databasesql: unknown driver \"postgres\" (forgotten import?)","time":"2023-04-24T14:33:25+03:00"}
+{"level":"error","msg":"Incorrect http method for /projects","time":"2023-04-24T17:22:20+03:00"}
+{"level":"error","msg":"Incorrect http method for /projects","time":"2023-04-24T17:22:29+03:00"}

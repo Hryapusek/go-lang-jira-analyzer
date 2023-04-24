@@ -6,10 +6,12 @@ import (
 	"JiraConnector/jsonmodels"
 	"JiraConnector/logging"
 	"encoding/json"
+	"errors"
 	"io"
 	"math"
 	"net/http"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -31,14 +33,14 @@ func NewJiraConnector() *JiraConnector {
 	}
 }
 
-func (connector *JiraConnector) GetProjectIssues(projectName string, timeToWaitMs int) map[jsonmodels.Issue]struct{} {
+func (connector *JiraConnector) GetProjectIssues(projectName string, timeToWaitMs int) (map[jsonmodels.Issue]struct{}, error) {
 	httpClient := &http.Client{}
 	response, err := httpClient.Get(connector.configReader.GetJiraRepositoryUrl() +
 		"/rest/api/2/search?jql=project=" + projectName + "&expand=changelog&startAt=0&maxResults=1")
 
 	if err != nil || response.StatusCode != http.StatusOK {
 		connector.logger.Log(logging.ERROR, "Unable to get issues for project "+projectName)
-		return nil
+		return map[jsonmodels.Issue]struct{}{}, nil
 	}
 
 	body, _ := io.ReadAll(response.Body)
@@ -48,7 +50,7 @@ func (connector *JiraConnector) GetProjectIssues(projectName string, timeToWaitM
 	totalIssuesCount := issueResponse.IssuesCount
 
 	if totalIssuesCount == 0 {
-		return map[jsonmodels.Issue]struct{}{}
+		return map[jsonmodels.Issue]struct{}{}, nil
 	}
 
 	issues := map[jsonmodels.Issue]struct{}{}
@@ -112,11 +114,65 @@ func (connector *JiraConnector) GetProjectIssues(projectName string, timeToWaitM
 			projectName+"\", waiting now"+strconv.Itoa(timeToWaitMs)+"ms")
 
 		if newTimeToSleep > connector.configReader.GetMaxTimeSleep() {
-			return nil
+			return map[jsonmodels.Issue]struct{}{}, errors.New("A lot of time to sleep")
 		}
 
 		return connector.GetProjectIssues(projectName, newTimeToSleep)
 	}
 
-	return issues
+	return issues, nil
+}
+
+func (connector *JiraConnector) GetProjects(limit int, page int, search string) (jsonmodels.ProjectsResponse, error) {
+	response, err := http.Get(connector.configReader.GetJiraRepositoryUrl() + "/rest/api/2/project")
+	if err != nil {
+		connector.logger.Log(logging.ERROR, "Unable to get projects list ")
+		return jsonmodels.ProjectsResponse{}, err
+	}
+
+	body, err := io.ReadAll(response.Body)
+
+	if err != nil {
+		return jsonmodels.ProjectsResponse{}, err
+	}
+
+	var jiraProjects []jsonmodels.JiraProject
+	err = json.Unmarshal(body, &jiraProjects)
+
+	if err != nil {
+		return jsonmodels.ProjectsResponse{}, err
+	}
+
+	var projects []jsonmodels.Project
+
+	projectsCount := 0
+
+	for _, elem := range jiraProjects {
+		if isProjectNameSatisfy(elem.Name, search) {
+			projectsCount++
+			projects = append(projects, jsonmodels.Project{
+				Name: elem.Name,
+				Link: elem.Link,
+			})
+		}
+	}
+
+	startIndex := limit * (page - 1)
+	endIndex := startIndex + limit
+	if endIndex >= len(projects) {
+		endIndex = len(projects)
+	}
+
+	return jsonmodels.ProjectsResponse{
+		Projects: projects[startIndex:endIndex],
+		PageInfo: jsonmodels.PageInfo{
+			PageCount:     int(math.Ceil(float64(projectsCount) / float64(limit))),
+			CurrentPage:   page,
+			ProjectsCount: projectsCount,
+		},
+	}, nil
+}
+
+func isProjectNameSatisfy(projectName string, search string) bool {
+	return strings.Contains(strings.ToLower(projectName), strings.ToLower(search))
 }

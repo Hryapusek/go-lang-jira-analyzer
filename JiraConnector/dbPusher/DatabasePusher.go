@@ -34,8 +34,6 @@ func NewDatabasePusher() *DatabasePusher {
 		log.Fatal("Can not open connection to database", err.Error())
 	}
 
-	fmt.Println("Successfully connected to database")
-
 	return &DatabasePusher{
 		configReader: configReaderInstance,
 		logger:       loggerInstance,

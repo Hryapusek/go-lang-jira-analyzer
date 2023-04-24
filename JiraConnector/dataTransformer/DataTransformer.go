@@ -15,6 +15,9 @@ func (dataTransformer *DataTransformer) TransformIssues(issues map[jsonmodels.Is
 		createdTime, _ := time.Parse("2006-01-02T15:04:05.999-0700", key.Fields.CreatedTime)
 		updatedTime, _ := time.Parse("2006-01-02T15:04:05.999-0700", key.Fields.UpdatedTime)
 		closedTime, _ := time.Parse("2006-01-02T15:04:05.999-0700", key.Fields.ClosedTime)
+		if len(key.Fields.ClosedTime) == 0 {
+			closedTime = createdTime.Add(time.Hour * 24 * 365 * 10)
+		}
 		timespent := closedTime.Sub(createdTime)
 
 		transformedIssues = append(transformedIssues, jsonmodels.TransformedIssue{
@@ -30,7 +33,7 @@ func (dataTransformer *DataTransformer) TransformIssues(issues map[jsonmodels.Is
 			CreatedTime: createdTime,
 			UpdatedTime: updatedTime,
 			ClosedTime:  closedTime,
-			Timespent:   timespent.Milliseconds(),
+			Timespent:   int64(timespent.Seconds()),
 		})
 	}
 
