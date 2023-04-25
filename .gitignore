@@ -11,6 +11,8 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
-log/*
+
+/ApiServer/log/analyticsLog.txt
+/ApiServer/log/connectorLog.txt
+/ApiServer/log/gatewayLog.txt
+/ApiServer/log/resourceLog.txt
