@@ -26,6 +26,10 @@ func (configReader *ConfigReader) GetLocalServerPort() uint {
 	return configReader.viperReader.GetUint("ProgramSettings.local_http_server_port")
 }
 
+func (configReader *ConfigReader) GetLocalServerHost() string {
+	return configReader.viperReader.GetString("ProgramSettings.local_http_server_host")
+}
+
 func (configReader *ConfigReader) GetThreadCount() int {
 	return configReader.viperReader.GetInt("ProgramSettings.threadCount")
 }

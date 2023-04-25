@@ -27,7 +27,7 @@ func NewServer() *Server {
 
 	return &Server{
 		configReader:    reader,
-		config:          NewServerConfig(reader.GetLocalServerPort()),
+		config:          NewServerConfig(reader.GetLocalServerHost(), reader.GetLocalServerPort()),
 		logger:          logging.NewLogger(),
 		connector:       connectorInstance,
 		dataTransformer: dataTransformer.NewDataTransformer(),
@@ -103,8 +103,8 @@ func extractProjectParameters(request *http.Request) (int, int, string) {
 }
 
 func (server *Server) routes() {
-	http.HandleFunc("/updateProject", server.updateProject)
-	http.HandleFunc("/projects", server.projects)
+	http.HandleFunc("/api/v1/connector/updateProject", server.updateProject)
+	http.HandleFunc("/api/v1/connector/projects", server.projects)
 }
 
 func (server *Server) start() {
