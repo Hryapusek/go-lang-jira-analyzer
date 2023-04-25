@@ -63,6 +63,15 @@ func main() {
 		r = r.WithContext(ctx)
 
 		proxy := httputil.NewSingleHostReverseProxy(analyticsTarget)
+
+		proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
+			if ctxStatus := r.Context().Err(); ctxStatus == context.DeadlineExceeded {
+				http.Error(w, "Request Timeout", http.StatusRequestTimeout)
+			} else {
+				http.Error(w, "Bad Gateway", http.StatusBadGateway)
+			}
+		}
+
 		proxy.ServeHTTP(w, r)
 	})
 
@@ -75,6 +84,15 @@ func main() {
 		r = r.WithContext(ctx)
 
 		proxy := httputil.NewSingleHostReverseProxy(resourceTarget)
+
+		proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
+			if ctxStatus := r.Context().Err(); ctxStatus == context.DeadlineExceeded {
+				http.Error(w, "Request Timeout", http.StatusRequestTimeout)
+			} else {
+				http.Error(w, "Bad Gateway", http.StatusBadGateway)
+			}
+		}
+
 		proxy.ServeHTTP(w, r)
 	})
 

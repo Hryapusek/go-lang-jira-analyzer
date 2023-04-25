@@ -2,7 +2,9 @@ package main
 
 import (
 	"ApiServer/internals/config"
+	"ApiServer/internals/endpoints/Analytics"
 	"fmt"
+	"github.com/gorilla/mux"
 	"io"
 	"log"
 	"net/http"
@@ -28,13 +30,20 @@ func main() {
 
 	cfg := config.LoadAnalyticsConfig("configs/server.yaml")
 
-	log.Printf("Create handler for mask \"%s\"", cfg.MainAPIPrefix+cfg.AnalyticsAPIPrefix)
+	analyticsRouter := mux.NewRouter()
 
-	analyticsRouter := http.NewServeMux()
+	log.Printf("Create handler for mask \"%s\"", cfg.MainAPIPrefix+cfg.AnalyticsAPIPrefix+"services")
+	analyticsRouter.HandleFunc(cfg.MainAPIPrefix+cfg.AnalyticsAPIPrefix+"services", endpoints.AnalyticsServices)
+	log.Printf("Create handler for mask \"%s\"", cfg.MainAPIPrefix+cfg.AnalyticsAPIPrefix+"{group:[1-5]}")
+	analyticsRouter.HandleFunc(cfg.MainAPIPrefix+cfg.AnalyticsAPIPrefix+"{group:[1-5]}",
+		endpoints.GetGraph).Queries("project", "{projectName}").Methods("GET") // если не указывать метод Queries, обрабтываются заранее невалидные запросы по аргументам
+	// т.е. -- оставить напоминание.
+
+	log.Printf("Create handler for mask \"%s\"", cfg.MainAPIPrefix+cfg.AnalyticsAPIPrefix)
 	analyticsRouter.HandleFunc(cfg.MainAPIPrefix+cfg.AnalyticsAPIPrefix, func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("New request for connector server at %s", r.URL.Path)
-		w.WriteHeader(200)
-		_, err := w.Write([]byte("Status is OK"))
+		log.Printf("New request for analytics server at %s", r.URL.Path)
+		w.WriteHeader(404)
+		_, err := w.Write([]byte("Status is 404"))
 		if err != nil {
 			return
 		}
@@ -42,7 +51,7 @@ func main() {
 
 	analyticsAddress := fmt.Sprintf("%s:%d", cfg.AnalyticsHost, cfg.AnalyticsPort)
 
-	log.Printf("Start connector server at %s", analyticsAddress)
+	log.Printf("Start analytics server at %s", analyticsAddress)
 	err = http.ListenAndServe(analyticsAddress, analyticsRouter)
 	if err != nil {
 		log.Fatalf("Unable to start connector server at %s", analyticsAddress)
