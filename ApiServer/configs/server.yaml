@@ -14,5 +14,5 @@ analytics_port: 8002
 analytics_api_prefix: "/graph/"
 
 connector_host: 127.0.0.1
-connector_port: 8003
+connector_port: 8081
 connector_api_prefix: "/connector/"
