@@ -1,18 +1,18 @@
 port: 8000
 host: 127.0.0.1
-api_prefix: "/api/v1/*"
+api_prefix: "/api/v1"
 
 resourceTimeout: 5
 analyticsTimeout: 15
 
 resource_host: 127.0.0.1
 resource_hort: 8001
-resource_api_prefix: "/api/v1/resource"
+resource_api_prefix: "/resource/"
 
 analytics_host: 127.0.0.1
 analytics_port: 8002
-analytics_api_prefix: "/api/v1/analytics"
+analytics_api_prefix: "/analytics/"
 
 connector_host: 127.0.0.1
 connector_port: 8003
-connector_api_prefix: "/api/v1/connector"
+connector_api_prefix: "/connector/"
