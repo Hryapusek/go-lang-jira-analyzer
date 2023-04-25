@@ -23,13 +23,15 @@ type Server struct {
 
 func NewServer() *Server {
 	reader := configReader.NewConfigReader()
+	connectorInstance := connector.NewJiraConnector()
+
 	return &Server{
 		configReader:    reader,
 		config:          NewServerConfig(reader.GetLocalServerPort()),
 		logger:          logging.NewLogger(),
-		connector:       connector.NewJiraConnector(),
+		connector:       connectorInstance,
 		dataTransformer: dataTransformer.NewDataTransformer(),
-		databasePusher:  dbPusher.NewDatabasePusher(),
+		databasePusher:  connectorInstance.DatabasePusher,
 	}
 }
 

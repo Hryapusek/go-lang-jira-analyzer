@@ -1,9 +1,9 @@
 DBSettings:
   username: postgres
-  password: postgres
+  password: admin
   hostname: localhost
-  port: 5432
-  name: postgres
+  port: 49153
+  name: testdb
 ProgramSettings:
   local_http_server_port: 8081
   jiraUrl: https://issues.apache.org/jira
