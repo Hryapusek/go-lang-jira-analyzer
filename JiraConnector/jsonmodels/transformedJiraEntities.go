@@ -13,7 +13,7 @@ type TransformedIssue struct {
 	Priority    string
 	Status      string
 	CreatedTime time.Time
-	UpdatedTime time.Time
 	ClosedTime  time.Time
+	UpdatedTime time.Time
 	Timespent   int64
 }

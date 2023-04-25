@@ -19,7 +19,7 @@ import (
 type JiraConnector struct {
 	configReader   *configReader.ConfigReader
 	repositoryUrl  string
-	databasePusher *dbPusher.DatabasePusher
+	DatabasePusher *dbPusher.DatabasePusher
 	logger         *logging.Logger
 }
 
@@ -28,7 +28,7 @@ func NewJiraConnector() *JiraConnector {
 	return &JiraConnector{
 		configReader:   reader,
 		repositoryUrl:  reader.GetJiraRepositoryUrl(),
-		databasePusher: dbPusher.NewDatabasePusher(),
+		DatabasePusher: dbPusher.NewDatabasePusher(),
 		logger:         logging.NewLogger(),
 	}
 }
