@@ -1,8 +1,6 @@
 package main
 
-import (
-	"JiraConnector/apiServer"
-)
+import "JiraConnector/apiServer"
 
 func main() {
 	apiServer.NewServer().Start()
