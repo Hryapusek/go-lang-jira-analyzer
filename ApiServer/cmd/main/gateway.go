@@ -3,94 +3,109 @@ package main
 import (
 	"ApiServer/internals/config"
 	"context"
+	_ "context"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
-	"strings"
-	"syscall"
+	_ "strings"
+	_ "syscall"
 	"time"
 )
 
-type route struct {
-	prefix  string
-	target  *url.URL
-	timeout time.Duration // Добавьте поле для установки времени ожидания
-}
-
 func main() {
+	file, err := os.Create("./log/gatewayLog.txt")
+	if err != nil {
+		log.SetOutput(os.Stdout)
+		log.Println("Cannot create log file", err)
+	} else {
+		logsOutput := io.MultiWriter(os.Stdout, file)
+		log.SetOutput(logsOutput)
+
+		defer func(file *os.File) {
+			err := file.Close()
+			if err != nil {
+				log.Println("Unable to close log file")
+			}
+		}(file)
+	}
+
 	cfg := config.LoadGatewayConfig("configs/server.yaml")
 
 	analyticsTarget, err := url.Parse(fmt.Sprintf("http://%s:%d", cfg.AnalyticsHost, cfg.AnalyticsPort))
 	if err != nil {
-		fmt.Printf("Error parsing target URL: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("Error parsing target URL: %v\n", err)
 	}
 
 	resourceTarget, err := url.Parse(fmt.Sprintf("http://%s:%d", cfg.ResourceHost, cfg.ResourcePort))
 	if err != nil {
-		fmt.Printf("Error parsing target URL: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("Error parsing target URL: %v\n", err)
 	}
 
 	connectorTarget, err := url.Parse(fmt.Sprintf("http://%s:%d", cfg.ConnectorHost, cfg.ConnectorPort))
 	if err != nil {
-		fmt.Printf("Error parsing target URL: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("Error parsing target URL: %v\n", err)
 	}
 
 	gatewayAddress := fmt.Sprintf("%s:%d", cfg.GatewayHost, cfg.GatewayPort)
 
-	// Разрешенные маршруты
-	routes := []route{
-		{cfg.AnalyticsAPIPrefix, analyticsTarget, time.Duration(cfg.AnalyticsTimeout) * time.Second},
-		{cfg.ResourceAPIPrefix, resourceTarget, time.Duration(cfg.ResourceTimeout) * time.Second},
-		{cfg.ConnectorAPIPrefix, connectorTarget, 0}, // Убираем временной лимит для микросервиса connector
-	}
+	gatewayMux := http.NewServeMux()
 
-	mux := http.NewServeMux()
-	mux.HandleFunc(cfg.GatewayAPIPrefix, func(w http.ResponseWriter, r *http.Request) {
-		for _, rt := range routes {
-			if strings.HasPrefix(r.URL.Path, rt.prefix) {
-				proxy := httputil.NewSingleHostReverseProxy(rt.target)
+	log.Println("Create proxy for analytics server.")
+	gatewayMux.HandleFunc(cfg.GatewayAPIPrefix+cfg.AnalyticsAPIPrefix, func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("Recieved request for analytics proxy: %s", r.URL.Path)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(cfg.AnalyticsTimeout))
+		defer cancel()
 
-				if rt.timeout > 0 {
-					ctx, cancel := context.WithTimeout(r.Context(), rt.timeout)
-					defer cancel()
-					r = r.WithContext(ctx)
+		r = r.WithContext(ctx)
 
-					done := make(chan struct{})
-					go func() {
-						proxy.ServeHTTP(w, r)
-						close(done)
-					}()
+		proxy := httputil.NewSingleHostReverseProxy(analyticsTarget)
 
-					select {
-					case <-done:
-					case <-ctx.Done():
-						w.WriteHeader(http.StatusGatewayTimeout)
-						_, err := fmt.Fprint(w, "Gateway Timeout")
-						if err != nil {
-							return
-						}
-					}
-				} else {
-					proxy.ServeHTTP(w, r)
-				}
-				return
+		proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
+			if ctxStatus := r.Context().Err(); ctxStatus == context.DeadlineExceeded {
+				http.Error(w, "Request Timeout", http.StatusRequestTimeout)
+			} else {
+				http.Error(w, "Bad Gateway", http.StatusBadGateway)
 			}
 		}
-		http.Error(w, "Not found", http.StatusNotFound)
+
+		proxy.ServeHTTP(w, r)
 	})
 
-	stop := make(chan os.Signal, 1)
+	log.Println("Create proxy for resource server.")
+	gatewayMux.HandleFunc(cfg.GatewayAPIPrefix+cfg.ResourceAPIPrefix, func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("Recieved request for resource proxy: %s", r.URL.Path)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(cfg.ResourceTimeout))
+		defer cancel() // нужно добавить логирование запросов + вывод истекших по timeout
 
-	fmt.Println("Starting reverse proxy server on ", gatewayAddress)
-	go func() {
-		if err := http.ListenAndServe(gatewayAddress, mux); err != nil {
-			fmt.Printf("ListenAndServe error: %v\n", err)
-			stop <- syscall.SIGTERM
+		r = r.WithContext(ctx)
+
+		proxy := httputil.NewSingleHostReverseProxy(resourceTarget)
+
+		proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
+			if ctxStatus := r.Context().Err(); ctxStatus == context.DeadlineExceeded {
+				http.Error(w, "Request Timeout", http.StatusRequestTimeout)
+			} else {
+				http.Error(w, "Bad Gateway", http.StatusBadGateway)
+			}
 		}
-	}()
+
+		proxy.ServeHTTP(w, r)
+	})
+
+	log.Println("Create proxy for connector server.")
+	gatewayMux.HandleFunc(cfg.GatewayAPIPrefix+cfg.ConnectorAPIPrefix, func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("Recieved request for connector proxy: %s", r.URL.Path)
+		proxy := httputil.NewSingleHostReverseProxy(connectorTarget)
+		proxy.ServeHTTP(w, r)
+	})
+
+	log.Printf("Start gateway server at %s", gatewayAddress)
+	err = http.ListenAndServe(gatewayAddress, gatewayMux)
+	if err != nil {
+		log.Fatalf("Unable to start gateway server at %s", gatewayAddress)
+	}
 }
