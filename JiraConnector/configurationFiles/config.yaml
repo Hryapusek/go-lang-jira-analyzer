@@ -1,8 +1,8 @@
 DBSettings:
   username: postgres
-  password: admin
+  password: password
   hostname: localhost
-  port: 49153
+  port: 5432
   name: testdb
 ProgramSettings:
   local_http_server_port: 8081

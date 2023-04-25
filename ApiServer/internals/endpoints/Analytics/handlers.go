@@ -54,7 +54,7 @@ func GetGraph(rw http.ResponseWriter, r *http.Request) {
 
 	switch group {
 	case 1:
-		data, err = json.Marshal(graph_placeholder(projectName))
+		data, err = json.Marshal(GraphOne(projectName))
 	case 2:
 		data, err = json.Marshal(graph_placeholder(projectName))
 	case 3:

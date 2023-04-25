@@ -108,7 +108,7 @@ func (server *Server) routes() {
 }
 
 func (server *Server) start() {
-	err := http.ListenAndServe(":"+strconv.Itoa(int(server.config.port)), nil)
+	err := http.ListenAndServe(server.config.host+":"+strconv.Itoa(int(server.config.port)), nil)
 	if err != nil {
 		server.logger.Log(logging.ERROR, "Error while starting a server...")
 		log.Fatal()

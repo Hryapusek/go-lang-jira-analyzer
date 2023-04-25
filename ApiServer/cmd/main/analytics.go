@@ -12,6 +12,7 @@ import (
 )
 
 func main() {
+
 	file, err := os.Create("./log/analyticsLog.txt")
 	if err != nil {
 		log.SetOutput(os.Stdout)
@@ -34,8 +35,8 @@ func main() {
 
 	log.Printf("Create handler for mask \"%s\"", cfg.MainAPIPrefix+cfg.AnalyticsAPIPrefix+"services")
 	analyticsRouter.HandleFunc(cfg.MainAPIPrefix+cfg.AnalyticsAPIPrefix+"services", endpoints.AnalyticsServices)
-	log.Printf("Create handler for mask \"%s\"", cfg.MainAPIPrefix+cfg.AnalyticsAPIPrefix+"{group:[1-5]}")
-	analyticsRouter.HandleFunc(cfg.MainAPIPrefix+cfg.AnalyticsAPIPrefix+"{group:[1-5]}",
+	log.Printf("Create handler for mask \"%s\"", cfg.MainAPIPrefix+cfg.AnalyticsAPIPrefix+"{group:[1-6]}")
+	analyticsRouter.HandleFunc(cfg.MainAPIPrefix+cfg.AnalyticsAPIPrefix+"{group:[1-6]}",
 		endpoints.GetGraph).Queries("project", "{projectName}").Methods("GET") // если не указывать метод Queries, обрабтываются заранее невалидные запросы по аргументам
 	// т.е. -- оставить напоминание.
 
@@ -56,4 +57,5 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to start connector server at %s", analyticsAddress)
 	}
+
 }
