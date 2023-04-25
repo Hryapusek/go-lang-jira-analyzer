@@ -54,6 +54,7 @@ func main() {
 
 	gatewayMux := http.NewServeMux()
 
+	log.Println("Create proxy for analytics server.")
 	gatewayMux.HandleFunc(cfg.GatewayAPIPrefix+cfg.AnalyticsAPIPrefix, func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Recieved request for analytics proxy: %s", r.URL.Path)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(cfg.AnalyticsTimeout))
@@ -65,6 +66,7 @@ func main() {
 		proxy.ServeHTTP(w, r)
 	})
 
+	log.Println("Create proxy for resource server.")
 	gatewayMux.HandleFunc(cfg.GatewayAPIPrefix+cfg.ResourceAPIPrefix, func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Recieved request for resource proxy: %s", r.URL.Path)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(cfg.ResourceTimeout))
@@ -76,12 +78,14 @@ func main() {
 		proxy.ServeHTTP(w, r)
 	})
 
+	log.Println("Create proxy for connector server.")
 	gatewayMux.HandleFunc(cfg.GatewayAPIPrefix+cfg.ConnectorAPIPrefix, func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Recieved request for connector proxy: %s", r.URL.Path)
 		proxy := httputil.NewSingleHostReverseProxy(connectorTarget)
 		proxy.ServeHTTP(w, r)
 	})
 
+	log.Printf("Start gateway server at %s", gatewayAddress)
 	err = http.ListenAndServe(gatewayAddress, gatewayMux)
 	if err != nil {
 		log.Fatalf("Unable to start gateway server at %s", gatewayAddress)
