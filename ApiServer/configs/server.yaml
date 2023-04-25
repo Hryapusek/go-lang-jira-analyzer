@@ -6,7 +6,7 @@ resourceTimeout: 5
 analyticsTimeout: 15
 
 resource_host: 127.0.0.1
-resource_hort: 8001
+resource_port: 8001
 resource_api_prefix: "/resource/"
 
 analytics_host: 127.0.0.1
