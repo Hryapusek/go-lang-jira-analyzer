@@ -46,7 +46,7 @@ func GetIssueInfoByID(id int) (IssueInfo, error) {
 	}
 	var issue IssueInfo
 	err := db.QueryRow(
-		"SELECT ("+
+		"SELECT "+
 			"projectId,"+
 			"authorId,"+
 			"key,"+
@@ -55,11 +55,10 @@ func GetIssueInfoByID(id int) (IssueInfo, error) {
 			"type,"+
 			"priority,"+
 			"status,"+
-			"EXTRACT(EPOCH FROM createdTime),"+
-			"EXTRACT(EPOCH FROM closedTime),"+
-			"EXTRACT(EPOCH FROM updatedTime),"+
-			"timeSpent"+
-			") "+
+			"EXTRACT(EPOCH FROM createdTime)::bigint,"+
+			"EXTRACT(EPOCH FROM closedTime)::bigint,"+
+			"EXTRACT(EPOCH FROM updatedTime)::bigint,"+
+			"timeSpent "+
 			"FROM Issue "+
 			"WHERE id = "+
 			fmt.Sprintf("%d;", id),
@@ -92,13 +91,12 @@ func GetAllHistoryInfoByIssueID(id int) ([]HistoryInfo, error) {
 
 	var history []HistoryInfo
 	rows, err := db.Query(
-		"SELECT (" +
+		"SELECT " +
 			"authorId," +
 			"EXTRACT(EPOCH FROM changeTime)," +
 			"fromStatus," +
-			"toStatus" +
-			") " +
-			"FROM StatusChange " +
+			"toStatus " +
+			"FROM StatusChanges " +
 			"WHERE issueId = " +
 			fmt.Sprintf("%d;", id),
 	)
@@ -143,11 +141,10 @@ func GetProjectInfoByID(id int) (ProjectInfo, error) {
 
 	var project ProjectInfo
 	err := db.QueryRow(
-		"SELECT (" +
-			"title" +
-			")" +
-			"FROM Projects" +
-			" WHERE id = " +
+		"SELECT " +
+			"title " +
+			"FROM Projects " +
+			"WHERE id = " +
 			fmt.Sprintf("%d;", id),
 	).Scan(
 		&project.Title,

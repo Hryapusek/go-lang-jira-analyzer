@@ -10,7 +10,6 @@ import (
 )
 
 func GetIssue(rw http.ResponseWriter, r *http.Request) {
-	rw.WriteHeader(200)
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -39,7 +38,6 @@ func GetIssue(rw http.ResponseWriter, r *http.Request) {
 }
 
 func GetHistory(rw http.ResponseWriter, r *http.Request) {
-	rw.WriteHeader(200)
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -70,7 +68,6 @@ func GetHistory(rw http.ResponseWriter, r *http.Request) {
 }
 
 func GetProject(rw http.ResponseWriter, r *http.Request) {
-	rw.WriteHeader(200)
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {

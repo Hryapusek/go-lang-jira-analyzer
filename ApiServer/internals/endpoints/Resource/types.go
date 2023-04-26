@@ -1,7 +1,6 @@
 package endpoints
 
 type IssueInfo struct {
-	Id          int    `json:"id"`
 	ProjectID   int    `json:"project_id"`
 	AuthorID    int    `json:"author_id"`
 	AssigneeId  int    `json:"assignee_id"`
