@@ -2,7 +2,9 @@ package main
 
 import (
 	"ApiServer/internals/config"
+	endpoints "ApiServer/internals/endpoints/Resource"
 	"fmt"
+	"github.com/gorilla/mux"
 	"io"
 	"log"
 	"net/http"
@@ -29,21 +31,20 @@ func main() {
 	cfg := config.LoadResourceConfig("configs/server.yaml")
 	log.Printf("Create handler for mask \"%s\"", cfg.MainAPIPrefix+cfg.ResourceAPIPrefix)
 
-	resourceRouter := http.NewServeMux()
-	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix, func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("New request for resource server at %s", r.URL.Path)
-		w.WriteHeader(200)
-		_, err := w.Write([]byte("Status is OK"))
-		if err != nil {
-			return
-		}
-	})
+	resourceRouter := mux.NewRouter()
+	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"issue/{id:[0-9]+}", endpoints.GetIssue).Methods("GET")
+	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"history/{id:[0-9]+}", endpoints.GetHistory).Methods("GET")
+	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"project/{id:[0-9]+}", endpoints.GetProject).Methods("GET")
+
+	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"issue/{id:[0-9]+}", endpoints.PostIssue).Methods("POST")
+	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"history/{id:[0-9]+}", endpoints.PostHistory).Methods("POST")
+	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"project/{id:[0-9]+}", endpoints.PostProject).Methods("POST")
 
 	resourceAddress := fmt.Sprintf("%s:%d", cfg.ResourceHost, cfg.ResourcePort)
 
 	log.Printf("Start resource server at %s", resourceAddress)
 	err = http.ListenAndServe(resourceAddress, resourceRouter)
 	if err != nil {
-		log.Fatalf("Unable to start resource server at %s", resourceAddress)
+		log.Fatalf("Unable to start resource server at %s, because of %s", resourceAddress, err.Error())
 	}
 }
