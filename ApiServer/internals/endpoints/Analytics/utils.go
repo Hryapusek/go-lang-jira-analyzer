@@ -49,7 +49,7 @@ func GraphOne(projectName string) []IssueForGraphOne {
 	rows, err := db.Query(
 		"SELECT " +
 			" i.id," +
-			" (EXTRACT(EPOCH FROM (i.closedTime)) - EXTRACT(EPOCH FROM (i.createdTime))) AS time_open_seconds" +
+			" FLOOR((EXTRACT(EPOCH FROM (i.closedTime)) - EXTRACT(EPOCH FROM (i.createdTime))))::bigint AS time_open_seconds" +
 			" FROM" +
 			" Issue i" +
 			" JOIN" +
@@ -101,7 +101,7 @@ func GraphTwo(projectName string) []IssueForGraphTwo {
 	rows, err := db.Query(
 		" SELECT" +
 			" i.id," +
-			" (EXTRACT(EPOCH FROM (now()::timestamp)) - EXTRACT(EPOCH FROM (i.createdTime))) AS time_open_seconds" +
+			" FLOOR((EXTRACT(EPOCH FROM (now()::timestamp)) - EXTRACT(EPOCH FROM (i.createdTime))))::bigint AS time_open_seconds" +
 			" FROM" +
 			" Issue i" +
 			" JOIN" +
@@ -135,4 +135,81 @@ func GraphTwo(projectName string) []IssueForGraphTwo {
 	}
 	log.Printf("We have result on /api/v1/graph/2 route!")
 	return issues
+}
+
+func GraphThree(projectName string) []GraphThreeData {
+	// Здесь строки с датой, где был создан и/или закрыт хотя бы один issue.
+	if db == nil {
+		initDB()
+	} else {
+		log.Println("Try to re-establish database connection.")
+
+		err := db.Ping()
+		if err != nil {
+			log.Fatalf("Can't connect to database.")
+		}
+	}
+
+	rows, err := db.Query(
+		"WITH created_issues AS (" +
+			" SELECT" +
+			" DATE(i.createdTime) AS date," +
+			" COUNT(*) AS created_count" +
+			" FROM" +
+			" Issue i" +
+			" JOIN" +
+			" Projects p ON p.id = i.projectId" +
+			" WHERE" +
+			fmt.Sprintf(" p.title = '%s'", projectName) +
+			" GROUP BY" +
+			" DATE(i.createdTime)" +
+			" )," +
+			" closed_issues AS (" +
+			" SELECT" +
+			" DATE(i.closedTime) AS date," +
+			" COUNT(*) AS closed_count" +
+			" FROM" +
+			" Issue i" +
+			" JOIN" +
+			" Projects p ON p.id = i.projectId" +
+			" WHERE" +
+			fmt.Sprintf(" p.title = '%s'", projectName) +
+			" AND i.status = 'Closed'" +
+			" GROUP BY" +
+			" DATE(i.closedTime)" +
+			" )" +
+			" SELECT" +
+			" FLOOR(EXTRACT(EPOCH FROM (COALESCE(ci.date, cl.date))::timestamp))::bigint AS unix_date," +
+			" COALESCE(ci.created_count, 0) AS created_issues," +
+			" COALESCE(cl.closed_count, 0) AS closed_issues" +
+			" FROM" +
+			" created_issues ci" +
+			" FULL OUTER JOIN" +
+			" closed_issues cl ON ci.date = cl.date" +
+			" ORDER BY" +
+			" unix_date;",
+	)
+	if err != nil {
+		log.Printf("Unable to query a database with /api/v1/graph/3 route: %s", err.Error())
+		return nil
+	}
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+			log.Printf("Unable to Close() on rows.")
+		}
+	}(rows)
+
+	var data []GraphThreeData
+
+	for rows.Next() {
+		var entry GraphThreeData
+		err := rows.Scan(&entry.Date, &entry.CreateIssues, &entry.ClosedIssues)
+		if err != nil {
+			log.Fatal(err)
+		}
+		data = append(data, entry)
+	}
+	log.Printf("We have result on /api/v1/graph/3 route!")
+	return data
 }
