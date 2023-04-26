@@ -22,3 +22,11 @@ db_port: 5432
 db_name: testdb
 db_user: postgres
 db_passwd: password
+
+local_http_server_port: 8003
+local_http_server_host: localhost
+jiraUrl: https://issues.apache.org/jira
+issueInOneRequest: 100
+threadCount: 10
+maxTimeSleep: 8000
+minTimeSleep: 50
