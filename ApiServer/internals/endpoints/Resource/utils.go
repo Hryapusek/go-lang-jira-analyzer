@@ -14,7 +14,7 @@ func init() {
 	initDB()
 }
 
-func initDB() int {
+func initDB() {
 	cfg := config.LoadDBConfig("configs/server.yaml")
 
 	connectionStr := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=disable",
@@ -33,7 +33,7 @@ func initDB() int {
 	}
 }
 
-func GetIssueInfoByID(id int) IssueInfo {
+func GetIssueInfoByID(id int) (*IssueInfo, error) {
 	if db == nil {
 		initDB()
 	} else {
@@ -43,13 +43,40 @@ func GetIssueInfoByID(id int) IssueInfo {
 		if err != nil {
 			log.Fatalf("Can't connect to database.")
 		}
+	}
+	var issue *IssueInfo
+	err := db.QueryRow(
+		"FROM Issue SELECT ("+
+			"projectId,"+
+			"authorId,"+
+			"key,"+
+			"summary,"+
+			"description,"+
+			"type,"+
+			"priority,"+
+			"status,"+
+			"EXTRACT(EPOCH FROM createdTime),"+
+			"EXTRACT(EPOCH FROM closedTime),"+
+			"EXTRACT(EPOCH FROM updatedTime),"+
+			"timeSpent"+
+			") WHERE id = "+
+			fmt.Sprintf("%d;", id),
+	).Scan(
+		&issue.ProjectID, &issue.AuthorID, &issue.Key, &issue.Summary,
+		&issue.Description, &issue.Type, &issue.Priority, &issue.Status,
+		&issue.CreatedTime, &issue.ClosedTime, &issue.UpdatedTime, &issue.TimeSpent,
+	)
+
+	if err != nil {
+		log.Printf("Error with querying an issue with id = %d", id)
+		return nil, err
 	}
 
 	log.Printf("Not implemented GetIssueInfoByID call")
-	return IssueInfo{}
+	return issue, nil
 }
 
-func GetHistoryInfoByID(id int) HistoryInfo {
+func GetAllHistoryInfoByIssueID(id int) (*[]HistoryInfo, error) {
 	if db == nil {
 		initDB()
 	} else {
@@ -61,11 +88,44 @@ func GetHistoryInfoByID(id int) HistoryInfo {
 		}
 	}
 
-	log.Printf("Not implemented GetHistoryInfoByID call")
-	return HistoryInfo{}
+	var history *[]HistoryInfo
+	rows, err := db.Query(
+		"FROM StatusChange SELECT (" +
+			"authorId," +
+			"EXTRACT(EPOCH FROM changeTime)," +
+			"fromStatus," +
+			"toStatus" +
+			") WHERE issueId = " +
+			fmt.Sprintf("%d;", id),
+	)
+
+	if err != nil {
+		log.Printf("Error with querying an history of issue with id = %d", id)
+		return history, err
+	}
+
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+			log.Printf("Unable to Close() on rows.")
+		}
+	}(rows)
+
+	for rows.Next() {
+		var statusChange HistoryInfo
+		err := rows.Scan(&statusChange.AuthorID, &statusChange.ChangeTime, &statusChange.FromStatus, &statusChange.ToStatus)
+		if err != nil {
+			log.Printf("Error on handling query to the database: %s", err.Error())
+			return nil, err
+		}
+		*history = append(*history, statusChange)
+	}
+
+	log.Printf("GetAllHistoryInfoByIssueID call")
+	return history, nil
 }
 
-func GetProjectInfoByID(id int) ProjectInfo {
+func GetProjectInfoByID(id int) (*ProjectInfo, error) {
 	if db == nil {
 		initDB()
 	} else {
@@ -77,8 +137,23 @@ func GetProjectInfoByID(id int) ProjectInfo {
 		}
 	}
 
-	log.Printf("Not implemented GetProjectByID call")
-	return ProjectInfo{}
+	var project *ProjectInfo
+	err := db.QueryRow(
+		"FROM Projects SELECT (" +
+			"title" +
+			") WHERE id = " +
+			fmt.Sprintf("%d;", id),
+	).Scan(
+		&project.Title,
+	)
+
+	if err != nil {
+		log.Printf("Error with querying an project with id = %d", id)
+		return nil, err
+	}
+
+	log.Printf("GetProjectByID call")
+	return project, nil
 }
 
 func PutProjectToDB(data ProjectInfo) (int, error) {

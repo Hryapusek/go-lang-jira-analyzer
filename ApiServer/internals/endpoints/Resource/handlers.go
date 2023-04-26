@@ -18,8 +18,13 @@ func GetIssue(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
-	data, err := json.Marshal(GetIssueInfoByID(id))
+	issue, err := GetIssueInfoByID(id)
+	if err != nil {
+		log.Printf("Request ended up with mistake of database: %s", err.Error())
+		rw.WriteHeader(400)
+		return
+	}
+	data, err := json.Marshal(*issue)
 	if err != nil {
 		log.Printf("Error with extracting info about issue project with id=%d", id)
 		rw.WriteHeader(400)
@@ -43,7 +48,14 @@ func GetHistory(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := json.Marshal(GetHistoryInfoByID(id))
+	history, err := GetAllHistoryInfoByIssueID(id)
+	if err != nil {
+		log.Printf("Request ended up with mistake of database: %s", err.Error())
+		rw.WriteHeader(400)
+		return
+	}
+
+	data, err := json.Marshal(*history)
 	if err != nil {
 		log.Printf("Error with extracting info about history with id=%d", id)
 		rw.WriteHeader(400)
@@ -67,7 +79,15 @@ func GetProject(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := json.Marshal(GetProjectInfoByID(id))
+	project, err := GetProjectInfoByID(id)
+
+	if err != nil {
+		log.Printf("Request ended up with mistake of database: %s", err.Error())
+		rw.WriteHeader(400)
+		return
+	}
+
+	data, err := json.Marshal(project)
 	if err != nil {
 		log.Printf("Error with extracting info about project with id=%d", id)
 		rw.WriteHeader(400)
