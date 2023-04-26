@@ -22,7 +22,6 @@ type IDResponse struct {
 }
 
 type ProjectInfo struct {
-	Id    int    `json:"id"`
 	Title string `json:"title"`
 }
 

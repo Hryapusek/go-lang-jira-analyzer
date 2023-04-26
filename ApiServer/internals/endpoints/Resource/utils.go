@@ -33,7 +33,7 @@ func initDB() {
 	}
 }
 
-func GetIssueInfoByID(id int) (*IssueInfo, error) {
+func GetIssueInfoByID(id int) (IssueInfo, error) {
 	if db == nil {
 		initDB()
 	} else {
@@ -44,7 +44,7 @@ func GetIssueInfoByID(id int) (*IssueInfo, error) {
 			log.Fatalf("Can't connect to database.")
 		}
 	}
-	var issue *IssueInfo
+	var issue IssueInfo
 	err := db.QueryRow(
 		"FROM Issue SELECT ("+
 			"projectId,"+
@@ -69,14 +69,14 @@ func GetIssueInfoByID(id int) (*IssueInfo, error) {
 
 	if err != nil {
 		log.Printf("Error with querying an issue with id = %d", id)
-		return nil, err
+		return IssueInfo{}, err
 	}
 
 	log.Printf("Not implemented GetIssueInfoByID call")
 	return issue, nil
 }
 
-func GetAllHistoryInfoByIssueID(id int) (*[]HistoryInfo, error) {
+func GetAllHistoryInfoByIssueID(id int) ([]HistoryInfo, error) {
 	if db == nil {
 		initDB()
 	} else {
@@ -88,7 +88,7 @@ func GetAllHistoryInfoByIssueID(id int) (*[]HistoryInfo, error) {
 		}
 	}
 
-	var history *[]HistoryInfo
+	var history []HistoryInfo
 	rows, err := db.Query(
 		"FROM StatusChange SELECT (" +
 			"authorId," +
@@ -118,14 +118,14 @@ func GetAllHistoryInfoByIssueID(id int) (*[]HistoryInfo, error) {
 			log.Printf("Error on handling query to the database: %s", err.Error())
 			return nil, err
 		}
-		*history = append(*history, statusChange)
+		history = append(history, statusChange)
 	}
 
 	log.Printf("GetAllHistoryInfoByIssueID call")
 	return history, nil
 }
 
-func GetProjectInfoByID(id int) (*ProjectInfo, error) {
+func GetProjectInfoByID(id int) (ProjectInfo, error) {
 	if db == nil {
 		initDB()
 	} else {
@@ -137,11 +137,13 @@ func GetProjectInfoByID(id int) (*ProjectInfo, error) {
 		}
 	}
 
-	var project *ProjectInfo
+	var project ProjectInfo
 	err := db.QueryRow(
-		"FROM Projects SELECT (" +
+		"SELECT (" +
 			"title" +
-			") WHERE id = " +
+			")" +
+			"FROM Projects" +
+			" WHERE id = " +
 			fmt.Sprintf("%d;", id),
 	).Scan(
 		&project.Title,
@@ -149,7 +151,7 @@ func GetProjectInfoByID(id int) (*ProjectInfo, error) {
 
 	if err != nil {
 		log.Printf("Error with querying an project with id = %d", id)
-		return nil, err
+		return ProjectInfo{}, err
 	}
 
 	log.Printf("GetProjectByID call")
