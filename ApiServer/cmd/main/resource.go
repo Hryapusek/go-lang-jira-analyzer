@@ -45,6 +45,6 @@ func main() {
 	log.Printf("Start resource server at %s", resourceAddress)
 	err = http.ListenAndServe(resourceAddress, resourceRouter)
 	if err != nil {
-		log.Fatalf("Unable to start resource server at %s", resourceAddress)
+		log.Fatalf("Unable to start resource server at %s, because of %s", resourceAddress, err.Error())
 	}
 }
