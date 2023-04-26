@@ -1,5 +1,7 @@
 package endpoints
 
+// TODO: надо оптимизировать запросы 5-6 (тесты в админке работают быстрее, а там оптимизатор)
+
 import (
 	"ApiServer/internals/config"
 	"database/sql"
@@ -214,7 +216,7 @@ func GraphThree(projectName string) []GraphThreeData {
 	return data
 }
 
-func GraphFive(projectName string) []GraphFiveData {
+func GraphFive(projectName string) []GraphFiveAndSixData {
 	// Подсчет кол-ва задач по статусу.
 	if db == nil {
 		initDB()
@@ -254,10 +256,65 @@ func GraphFive(projectName string) []GraphFiveData {
 		}
 	}(rows)
 
-	var data []GraphFiveData
+	var data []GraphFiveAndSixData
 
 	for rows.Next() {
-		var entry GraphFiveData
+		var entry GraphFiveAndSixData
+		err := rows.Scan(&entry.PriorityType, &entry.Count)
+		if err != nil {
+			log.Fatal(err)
+		}
+		data = append(data, entry)
+	}
+	log.Printf("We have result on /api/v1/graph/5 route!")
+	return data
+}
+
+func GraphSix(projectName string) []GraphFiveAndSixData {
+	// Подсчет кол-ва задач по статусу.
+	if db == nil {
+		initDB()
+	} else {
+		log.Println("Try to re-establish database connection.")
+
+		err := db.Ping()
+		if err != nil {
+			log.Fatalf("Can't connect to database.")
+		}
+	}
+
+	rows, err := db.Query(
+		"SELECT" +
+			" i.priority," +
+			" COUNT(*) AS issue_count" +
+			" FROM" +
+			" Issue i" +
+			" JOIN" +
+			" Projects p ON p.id = i.projectId" +
+			" WHERE" +
+			fmt.Sprintf(" p.title = '%s' AND", projectName) +
+			" i.status = 'Closed' AND" +
+			" i.priority IN ('Minor', 'Major', 'Blocker', 'Critical')" +
+			" GROUP BY" +
+			" i.priority" +
+			" ORDER BY" +
+			" i.priority;",
+	)
+	if err != nil {
+		log.Printf("Unable to query a database with /api/v1/graph/5 route: %s", err.Error())
+		return nil
+	}
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+			log.Printf("Unable to Close() on rows.")
+		}
+	}(rows)
+
+	var data []GraphFiveAndSixData
+
+	for rows.Next() {
+		var entry GraphFiveAndSixData
 		err := rows.Scan(&entry.PriorityType, &entry.Count)
 		if err != nil {
 			log.Fatal(err)

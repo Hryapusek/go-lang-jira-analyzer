@@ -16,7 +16,7 @@ type GraphThreeData struct {
 	ClosedIssues int    `json:"closed_issues"`
 }
 
-type GraphFiveData struct {
+type GraphFiveAndSixData struct {
 	PriorityType string `json:"priority_type"`
 	Count        int    `json:"count"`
 }
