@@ -1,21 +1,20 @@
 package endpoints
 
-import "time"
-
 type IssueInfo struct {
-	Id          int       `json:"id"`
-	ProjectID   int       `json:"project_id"`
-	AuthorID    int       `json:"author_id"`
-	AssigneeId  int       `json:"assignee_id"`
-	Key         string    `json:"key"`
-	Summary     string    `json:"summary"`
-	Type        string    `json:"type"`
-	Priority    string    `json:"priority"`
-	Status      string    `json:"status"`
-	CreatedTime time.Time `json:"created_time"`
-	ClosedTime  time.Time `json:"closed_time"`
-	UpdatedTime time.Time `json:"updated_time"`
-	TimeSpent   time.Time `json:"timespent"`
+	Id          int    `json:"id"`
+	ProjectID   int    `json:"project_id"`
+	AuthorID    int    `json:"author_id"`
+	AssigneeId  int    `json:"assignee_id"`
+	Key         string `json:"key"`
+	Summary     string `json:"summary"`
+	Description string `json:"description"`
+	Type        string `json:"type"`
+	Priority    string `json:"priority"`
+	Status      string `json:"status"`
+	CreatedTime uint64 `json:"created_time"`
+	ClosedTime  uint64 `json:"closed_time"`
+	UpdatedTime uint64 `json:"updated_time"`
+	TimeSpent   uint64 `json:"timespent"`
 }
 
 type ProjectInfo struct {
@@ -24,9 +23,9 @@ type ProjectInfo struct {
 }
 
 type HistoryInfo struct {
-	IssueID    int       `json:"issue_id"`
-	AuthorID   int       `json:"author_id"`
-	ChangeTime time.Time `json:"change_time"`
-	FromStatus string    `json:"from_status"`
-	ToStatus   string    `json:"to_status"`
+	IssueID    int    `json:"issue_id"`
+	AuthorID   int    `json:"author_id"`
+	ChangeTime uint64 `json:"change_time"`
+	FromStatus string `json:"from_status"`
+	ToStatus   string `json:"to_status"`
 }
