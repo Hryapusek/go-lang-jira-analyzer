@@ -24,7 +24,7 @@ func GetIssue(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(400)
 		return
 	}
-	data, err := json.Marshal(*issue)
+	data, err := json.Marshal(issue)
 	if err != nil {
 		log.Printf("Error with extracting info about issue project with id=%d", id)
 		rw.WriteHeader(400)
@@ -55,7 +55,7 @@ func GetHistory(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := json.Marshal(*history)
+	data, err := json.Marshal(history)
 	if err != nil {
 		log.Printf("Error with extracting info about history with id=%d", id)
 		rw.WriteHeader(400)

@@ -46,7 +46,7 @@ func GetIssueInfoByID(id int) (IssueInfo, error) {
 	}
 	var issue IssueInfo
 	err := db.QueryRow(
-		"FROM Issue SELECT ("+
+		"SELECT ("+
 			"projectId,"+
 			"authorId,"+
 			"key,"+
@@ -59,7 +59,9 @@ func GetIssueInfoByID(id int) (IssueInfo, error) {
 			"EXTRACT(EPOCH FROM closedTime),"+
 			"EXTRACT(EPOCH FROM updatedTime),"+
 			"timeSpent"+
-			") WHERE id = "+
+			") "+
+			"FROM Issue "+
+			"WHERE id = "+
 			fmt.Sprintf("%d;", id),
 	).Scan(
 		&issue.ProjectID, &issue.AuthorID, &issue.Key, &issue.Summary,
@@ -90,12 +92,14 @@ func GetAllHistoryInfoByIssueID(id int) ([]HistoryInfo, error) {
 
 	var history []HistoryInfo
 	rows, err := db.Query(
-		"FROM StatusChange SELECT (" +
+		"SELECT (" +
 			"authorId," +
 			"EXTRACT(EPOCH FROM changeTime)," +
 			"fromStatus," +
 			"toStatus" +
-			") WHERE issueId = " +
+			") " +
+			"FROM StatusChange " +
+			"WHERE issueId = " +
 			fmt.Sprintf("%d;", id),
 	)
 
