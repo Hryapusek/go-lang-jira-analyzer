@@ -5,8 +5,8 @@ DBSettings:
   port: 5432
   name: testdb
 ProgramSettings:
-  local_http_server_port: 8081
-  local_http_server_host: "localhost"
+  local_http_server_port: 8003
+  local_http_server_host: localhost
   jiraUrl: https://issues.apache.org/jira
   issueInOneRequest: 100
   threadCount: 10
