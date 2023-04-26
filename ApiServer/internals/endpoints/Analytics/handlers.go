@@ -62,6 +62,8 @@ func GetGraph(rw http.ResponseWriter, r *http.Request) {
 	case 4:
 		data, err = json.Marshal(graph_placeholder(projectName))
 	case 5:
+		data, err = json.Marshal(GraphFive(projectName))
+	case 6:
 		data, err = json.Marshal(graph_placeholder(projectName))
 	}
 

@@ -213,3 +213,57 @@ func GraphThree(projectName string) []GraphThreeData {
 	log.Printf("We have result on /api/v1/graph/3 route!")
 	return data
 }
+
+func GraphFive(projectName string) []GraphFiveData {
+	// Подсчет кол-ва задач по статусу.
+	if db == nil {
+		initDB()
+	} else {
+		log.Println("Try to re-establish database connection.")
+
+		err := db.Ping()
+		if err != nil {
+			log.Fatalf("Can't connect to database.")
+		}
+	}
+
+	rows, err := db.Query(
+		"SELECT" +
+			" i.priority," +
+			" COUNT(*) AS issue_count" +
+			" FROM" +
+			" Issue i" +
+			" JOIN" +
+			" Projects p ON p.id = i.projectId" +
+			" WHERE" +
+			fmt.Sprintf(" p.title = '%s' AND", projectName) +
+			" i.priority IN ('Minor', 'Major', 'Blocker', 'Critical')" +
+			" GROUP BY" +
+			" i.priority" +
+			" ORDER BY" +
+			" i.priority;",
+	)
+	if err != nil {
+		log.Printf("Unable to query a database with /api/v1/graph/5 route: %s", err.Error())
+		return nil
+	}
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+			log.Printf("Unable to Close() on rows.")
+		}
+	}(rows)
+
+	var data []GraphFiveData
+
+	for rows.Next() {
+		var entry GraphFiveData
+		err := rows.Scan(&entry.PriorityType, &entry.Count)
+		if err != nil {
+			log.Fatal(err)
+		}
+		data = append(data, entry)
+	}
+	log.Printf("We have result on /api/v1/graph/5 route!")
+	return data
+}
