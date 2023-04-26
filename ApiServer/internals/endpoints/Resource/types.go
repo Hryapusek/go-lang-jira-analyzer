@@ -17,9 +17,13 @@ type IssueInfo struct {
 	TimeSpent   uint64 `json:"timespent"`
 }
 
+type IDResponse struct {
+	Id int `json:"id"`
+}
+
 type ProjectInfo struct {
-	Id          int    `json:"id"`
-	Description string `json:"description"`
+	Id    int    `json:"id"`
+	Title string `json:"title"`
 }
 
 type HistoryInfo struct {

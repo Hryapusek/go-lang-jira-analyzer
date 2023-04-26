@@ -14,7 +14,7 @@ func init() {
 	initDB()
 }
 
-func initDB() {
+func initDB() int {
 	cfg := config.LoadDBConfig("configs/server.yaml")
 
 	connectionStr := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=disable",
@@ -81,7 +81,7 @@ func GetProjectInfoByID(id int) ProjectInfo {
 	return ProjectInfo{}
 }
 
-func PutProjectToDB(data ProjectInfo) error {
+func PutProjectToDB(data ProjectInfo) (int, error) {
 	if db == nil {
 		initDB()
 	} else {
@@ -93,8 +93,18 @@ func PutProjectToDB(data ProjectInfo) error {
 		}
 	}
 
-	log.Printf("Not implemented PutProjectToDB call")
-	return nil
+	var newID int
+
+	err := db.QueryRow(
+		"INSERT INTO Projects (" +
+			"title" +
+			") VALUES (" +
+			fmt.Sprintf("'%s'", data.Title) +
+			") RETURNING id",
+	).Scan(newID)
+
+	log.Printf("PutProjectToDB call")
+	return newID, err
 }
 
 func PutHistoryToDB(data HistoryInfo) error {
@@ -109,11 +119,28 @@ func PutHistoryToDB(data HistoryInfo) error {
 		}
 	}
 
-	log.Printf("Not implemented PutHistoryToDB call")
-	return nil
+	err := db.QueryRow("INSERT INTO StatusChanges (" +
+		"issueId," +
+		"authorId," +
+		"changeTime," +
+		"fromStatus," +
+		"toStatus" +
+		") VALUES " +
+		fmt.Sprintf("("+
+			"%d,"+
+			"%d,"+
+			"to_timestamp(%d),"+
+			"'%s',"+
+			"'%s'"+
+			");", data.IssueID, data.AuthorID, data.ChangeTime, data.FromStatus, data.ToStatus,
+		),
+	).Err()
+
+	log.Printf("PutHistoryToDB call")
+	return err
 }
 
-func PutIssueToDB(data IssueInfo) error {
+func PutIssueToDB(data IssueInfo) (int, error) {
 	if db == nil {
 		initDB()
 	} else {
@@ -125,7 +152,8 @@ func PutIssueToDB(data IssueInfo) error {
 		}
 	}
 
-	_, err := db.Query(
+	var newID int
+	err := db.QueryRow(
 		"INSERT INTO Issue (" +
 			"projectId," +
 			"authorId," +
@@ -158,9 +186,9 @@ func PutIssueToDB(data IssueInfo) error {
 				data.Type, data.Priority, data.Status, data.CreatedTime, data.ClosedTime, data.UpdatedTime,
 				data.TimeSpent,
 			) +
-			")",
-	)
+			") RETURNING id",
+	).Scan(&newID)
 
 	log.Printf("PutIssueToDB call")
-	return err
+	return newID, err
 }

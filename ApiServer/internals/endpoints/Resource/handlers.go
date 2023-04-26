@@ -92,11 +92,19 @@ func PostIssue(rw http.ResponseWriter, r *http.Request) {
 		// Обработка ошибки
 	}
 
-	err = PutIssueToDB(data)
+	id, err := PutIssueToDB(data)
 	if err != nil {
 		log.Printf("Error %s occured while puting issue to DB", err.Error())
 	} else {
 		rw.WriteHeader(http.StatusCreated)
+		resp, err := json.Marshal(IDResponse{id})
+		if err != nil {
+			log.Println(err.Error())
+		}
+		_, err = rw.Write(resp)
+		if err != nil {
+			return
+		}
 	}
 }
 
@@ -128,10 +136,18 @@ func PostProject(rw http.ResponseWriter, r *http.Request) {
 		// Обработка ошибки
 	}
 
-	err = PutProjectToDB(data)
+	id, err := PutProjectToDB(data)
 	if err != nil {
-		log.Printf("Error %s occured while puting project to DB", err.Error())
+		log.Printf("Error %s occured while puting issue to DB", err.Error())
 	} else {
 		rw.WriteHeader(http.StatusCreated)
+		resp, err := json.Marshal(IDResponse{id})
+		if err != nil {
+			log.Println(err.Error())
+		}
+		_, err = rw.Write(resp)
+		if err != nil {
+			return
+		}
 	}
 }
