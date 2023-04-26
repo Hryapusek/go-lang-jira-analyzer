@@ -1,1 +1,5 @@
 {"level":"info","msg":"Starting server...","time":"2023-04-25T20:46:05+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-25T23:09:47+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-25T23:11:04+03:00"}
+{"level":"info","msg":"Starting server...","time":"2023-04-25T23:58:33+03:00"}
+{"level":"error","msg":"Incorrect http method for /updateProject","time":"2023-04-25T23:59:49+03:00"}

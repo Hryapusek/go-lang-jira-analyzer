@@ -3,7 +3,7 @@ host: 127.0.0.1
 api_prefix: "/api/v1"
 
 resourceTimeout: 5
-analyticsTimeout: 1
+analyticsTimeout: 15
 
 resource_host: 127.0.0.1
 resource_port: 8001
@@ -16,3 +16,9 @@ analytics_api_prefix: "/graph/"
 connector_host: 127.0.0.1
 connector_port: 8003
 connector_api_prefix: "/connector/"
+
+db_host: localhost
+db_port: 5432
+db_name: testdb
+db_user: postgres
+db_passwd: password

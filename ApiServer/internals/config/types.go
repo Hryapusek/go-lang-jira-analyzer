@@ -40,3 +40,11 @@ type ConnectorConfig struct {
 	ConnectorAPIPrefix string `yaml:"connector_api_prefix"`
 	MainAPIPrefix      string `yaml:"api_prefix"`
 }
+
+type DBConfig struct {
+	HostDB     string `yaml:"db_host"`
+	PortDB     int    `yaml:"db_port"`
+	UserDB     string `yaml:"db_user"`
+	PasswordDB string `yaml:"db_passwd"`
+	NameDB     string `yaml:"db_name"`
+}

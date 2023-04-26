@@ -8,14 +8,6 @@ import (
 	"strconv"
 )
 
-func graph_placeholder(projectName string) map[int]int { // для проверки функционала,
-	// TODO: снести в конце
-	return map[int]int{
-		1: 1,
-		2: 4,
-	}
-}
-
 var services = []string{
 	"/api/v1/graph/services",
 	"/api/v1/graph/1",
@@ -23,6 +15,7 @@ var services = []string{
 	"/api/v1/graph/3",
 	"/api/v1/graph/4",
 	"/api/v1/graph/5",
+	"/api/v1/graph/6",
 }
 
 func AnalyticsServices(rw http.ResponseWriter, r *http.Request) {
@@ -54,15 +47,21 @@ func GetGraph(rw http.ResponseWriter, r *http.Request) {
 
 	switch group {
 	case 1:
-		data, err = json.Marshal(graph_placeholder(projectName))
+		data, err = json.Marshal(GraphOne(projectName))
 	case 2:
-		data, err = json.Marshal(graph_placeholder(projectName))
+		data, err = json.Marshal(GraphTwo(projectName))
 	case 3:
-		data, err = json.Marshal(graph_placeholder(projectName))
+		data, err = json.Marshal(GraphThree(projectName))
 	case 4:
-		data, err = json.Marshal(graph_placeholder(projectName))
+		data, err = json.Marshal(GraphFour(projectName))
 	case 5:
-		data, err = json.Marshal(graph_placeholder(projectName))
+		data, err = json.Marshal(GraphFive(projectName))
+	case 6:
+		data, err = json.Marshal(GraphSix(projectName))
+	default:
+		log.Printf("Not exisiting group parameter at /api/v1/graph/{group:[1-6]}. Ты как сюда попал??")
+		rw.WriteHeader(403)
+		return
 	}
 
 	if err != nil {
