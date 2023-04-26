@@ -231,14 +231,14 @@ func GraphFour(projectName string) []GraphFourData {
 
 	rows, err := db.Query(
 		"SELECT" +
-			" i.type AS severity," +
+			" i.type AS issue_type," +
 			" COUNT(*) AS issue_count" +
 			" FROM" +
 			" Issue i" +
 			" JOIN" +
 			" Projects p ON p.id = i.projectId" +
 			" WHERE" +
-			" p.title = 'Project_Name'" +
+			fmt.Sprintf(" p.title = '%s'", projectName) +
 			" GROUP BY" +
 			" i.type" +
 			" ORDER BY" +
