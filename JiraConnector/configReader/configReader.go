@@ -12,9 +12,9 @@ type ConfigReader struct {
 func NewConfigReader() *ConfigReader {
 	configReader := ConfigReader{}
 	configReader.viperReader = viper.New()
-	configReader.viperReader.SetConfigName("config")
+	configReader.viperReader.SetConfigName("server")
 	configReader.viperReader.SetConfigType("yaml")
-	configReader.viperReader.AddConfigPath("./configurationFiles")
+	configReader.viperReader.AddConfigPath("./configs")
 	if err := configReader.viperReader.ReadInConfig(); err != nil {
 		log.Fatal()
 	}
@@ -23,49 +23,49 @@ func NewConfigReader() *ConfigReader {
 }
 
 func (configReader *ConfigReader) GetLocalServerPort() uint {
-	return configReader.viperReader.GetUint("ProgramSettings.local_http_server_port")
+	return configReader.viperReader.GetUint("connector_port")
 }
 
 func (configReader *ConfigReader) GetLocalServerHost() string {
-	return configReader.viperReader.GetString("ProgramSettings.local_http_server_host")
+	return configReader.viperReader.GetString("connector_host")
 }
 
 func (configReader *ConfigReader) GetThreadCount() int {
-	return configReader.viperReader.GetInt("ProgramSettings.threadCount")
+	return configReader.viperReader.GetInt("threadCount")
 }
 
 func (configReader *ConfigReader) GetJiraRepositoryUrl() string {
-	return configReader.viperReader.GetString("ProgramSettings.jiraUrl")
+	return configReader.viperReader.GetString("jiraUrl")
 }
 
 func (configReader *ConfigReader) GetIssuesPerRequest() int {
-	return configReader.viperReader.GetInt("ProgramSettings.issueInOneRequest")
+	return configReader.viperReader.GetInt("issueInOneRequest")
 }
 
 func (configReader *ConfigReader) GetMinTimeSleep() int {
-	return configReader.viperReader.GetInt("ProgramSettings.minTimeSleep")
+	return configReader.viperReader.GetInt("minTimeSleep")
 }
 
 func (configReader *ConfigReader) GetMaxTimeSleep() int {
-	return configReader.viperReader.GetInt("ProgramSettings.maxTimeSleep")
+	return configReader.viperReader.GetInt("maxTimeSleep")
 }
 
 func (configReader *ConfigReader) GetDbUsername() string {
-	return configReader.viperReader.GetString("DBSettings.username")
+	return configReader.viperReader.GetString("db_user")
 }
 
 func (configReader *ConfigReader) GetDbPassword() string {
-	return configReader.viperReader.GetString("DBSettings.password")
+	return configReader.viperReader.GetString("db_passwd")
 }
 
 func (configReader *ConfigReader) GetDbHost() string {
-	return configReader.viperReader.GetString("DBSettings.hostname")
+	return configReader.viperReader.GetString("db_host")
 }
 
 func (configReader *ConfigReader) GetDbPort() int {
-	return configReader.viperReader.GetInt("DBSettings.port")
+	return configReader.viperReader.GetInt("db_port")
 }
 
 func (configReader *ConfigReader) GetDbName() string {
-	return configReader.viperReader.GetString("DBSettings.name")
+	return configReader.viperReader.GetString("db_name")
 }

@@ -1,1 +1,10 @@
 {"level":"error","msg":"Incorrect http method for /updateProject","time":"2023-04-25T23:59:49+03:00"}
+{"level":"error","msg":"Incorrect http method for /updateProject","time":"2023-04-26T04:05:24+03:00"}
+{"level":"error","msg":"Incorrect http method for /updateProject","time":"2023-04-26T04:05:36+03:00"}
+{"level":"error","msg":"Unable to get issues for project Airavat","time":"2023-04-26T08:35:14+03:00"}
+{"level":"error","msg":"Unable to get issues for project Airavat","time":"2023-04-26T08:37:18+03:00"}
+{"level":"error","msg":"Incorrect http method for /projects","time":"2023-04-26T08:38:16+03:00"}
+{"level":"error","msg":"Incorrect http method for /updateProject","time":"2023-04-26T08:39:19+03:00"}
+{"level":"error","msg":"Incorrect http method for /updateProject","time":"2023-04-26T08:56:48+03:00"}
+{"level":"error","msg":"Incorrect http method for /projects","time":"2023-04-26T08:57:08+03:00"}
+time="2023-04-26T08:58:49+03:00" level=error msg="Error while starting a server..."
