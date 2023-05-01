@@ -72,6 +72,7 @@ func GetIssueInfoByID(id int) (IssueInfo, error) {
 		return IssueInfo{}, err
 	}
 
+	issue.IssueID = id
 	log.Printf("Not implemented GetIssueInfoByID call")
 	return issue, nil
 }
