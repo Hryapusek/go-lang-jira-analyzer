@@ -180,7 +180,7 @@ func PutProjectToDB(data ProjectInfo) (int, error) {
 			") VALUES (" +
 			fmt.Sprintf("'%s'", data.Title) +
 			") RETURNING id",
-	).Scan(newID)
+	).Scan(&newID)
 
 	log.Printf("PutProjectToDB call")
 	return newID, err
