@@ -25,7 +25,7 @@ func GetIssue(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	project, err := GetProjectInfoByID(*issue.ProjectID)
+	project, err := GetProjectInfoByID(issue.ProjectID)
 	if err != nil {
 		log.Printf("Request ended up with mistake of database: %s", err.Error())
 		rw.WriteHeader(400)
@@ -222,7 +222,7 @@ func PostHistory(rw http.ResponseWriter, r *http.Request) {
 	} else {
 		rw.WriteHeader(http.StatusCreated)
 		statusCode = http.StatusCreated
-		id = *data.IssueID
+		id = data.IssueID
 	}
 
 	resp, err := json.Marshal(RestAPIPostResponseSchema{

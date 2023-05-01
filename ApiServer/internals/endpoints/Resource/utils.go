@@ -44,22 +44,7 @@ func GetIssueInfoByID(id int) (IssueInfo, error) {
 			log.Fatalf("Can't connect to database.")
 		}
 	}
-	var issue = IssueInfo{
-		IssueID:     &id,
-		ProjectID:   new(int),
-		AuthorID:    new(int),
-		AssigneeId:  new(int),
-		Key:         new(string),
-		Summary:     new(string),
-		Description: new(string),
-		Type:        new(string),
-		Priority:    new(string),
-		Status:      new(string),
-		CreatedTime: new(uint64),
-		ClosedTime:  new(uint64),
-		UpdatedTime: new(uint64),
-		TimeSpent:   new(uint64),
-	}
+	var issue = IssueInfo{}
 	err := db.QueryRow(
 		"SELECT "+
 			"projectId,"+
@@ -77,9 +62,9 @@ func GetIssueInfoByID(id int) (IssueInfo, error) {
 			"FROM Issue "+
 			"WHERE id = $1", id,
 	).Scan(
-		issue.ProjectID, issue.AuthorID, issue.Key, issue.Summary,
-		issue.Description, issue.Type, issue.Priority, issue.Status,
-		issue.CreatedTime, issue.ClosedTime, issue.UpdatedTime, issue.TimeSpent,
+		&issue.ProjectID, &issue.AuthorID, &issue.Key, &issue.Summary,
+		&issue.Description, &issue.Type, &issue.Priority, &issue.Status,
+		&issue.CreatedTime, &issue.ClosedTime, &issue.UpdatedTime, &issue.TimeSpent,
 	)
 
 	if err != nil {
@@ -127,14 +112,8 @@ func GetAllHistoryInfoByIssueID(id int) ([]HistoryInfo, error) {
 	}(rows)
 
 	for rows.Next() {
-		var statusChange = HistoryInfo{
-			IssueID:    &id,
-			AuthorID:   new(int),
-			ChangeTime: new(uint64),
-			FromStatus: new(string),
-			ToStatus:   new(string),
-		}
-		err := rows.Scan(statusChange.AuthorID, statusChange.ChangeTime, statusChange.FromStatus, statusChange.ToStatus)
+		var statusChange = HistoryInfo{}
+		err := rows.Scan(&statusChange.AuthorID, &statusChange.ChangeTime, &statusChange.FromStatus, &statusChange.ToStatus)
 		if err != nil {
 			log.Printf("Error on handling query to the database: %s", err.Error())
 			return nil, err
@@ -158,10 +137,7 @@ func GetProjectInfoByID(id int) (ProjectInfo, error) {
 		}
 	}
 
-	var project = ProjectInfo{
-		ProjectID: new(int),
-		Title:     new(string),
-	}
+	var project = ProjectInfo{}
 
 	err := db.QueryRow(
 		"SELECT "+
@@ -169,7 +145,7 @@ func GetProjectInfoByID(id int) (ProjectInfo, error) {
 			"FROM Projects "+
 			"WHERE id = $1", id,
 	).Scan(
-		project.Title,
+		&project.Title,
 	)
 
 	if err != nil {
@@ -177,7 +153,7 @@ func GetProjectInfoByID(id int) (ProjectInfo, error) {
 		return ProjectInfo{}, err
 	}
 
-	project.ProjectID = &id
+	project.ProjectID = id
 	log.Printf("GetProjectByID call")
 	return project, nil
 }
