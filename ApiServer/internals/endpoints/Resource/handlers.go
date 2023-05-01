@@ -25,7 +25,7 @@ func GetIssue(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	project, err := GetProjectInfoByID(issue.ProjectID)
+	project, err := GetProjectInfoByID(*issue.ProjectID)
 	if err != nil {
 		log.Printf("Request ended up with mistake of database: %s", err.Error())
 		rw.WriteHeader(400)
@@ -76,13 +76,11 @@ func GetHistory(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	issue := IssueInfo{}
-	if len(history) != 0 {
-		issue, err = GetIssueInfoByID(history[0].IssueID)
-		if err != nil {
-			log.Printf("Request ended up with mistake of database: %s", err.Error())
-			rw.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+	issue, err = GetIssueInfoByID(id)
+	if err != nil {
+		log.Printf("Request ended up with mistake of database: %s", err.Error())
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	var historyResponse = RestAPIGetResponseSchema{
@@ -214,15 +212,17 @@ func PostHistory(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	var statusCode int
+	var id int
 	err = PutHistoryToDB(data)
 	if err != nil {
 		log.Printf("Error %s occured while puting history to DB", err.Error())
 		rw.WriteHeader(http.StatusInternalServerError)
-		data.IssueID = -1
+		id = -1
 		statusCode = http.StatusInternalServerError
 	} else {
 		rw.WriteHeader(http.StatusCreated)
 		statusCode = http.StatusCreated
+		id = *data.IssueID
 	}
 
 	resp, err := json.Marshal(RestAPIPostResponseSchema{
@@ -232,7 +232,7 @@ func PostHistory(rw http.ResponseWriter, r *http.Request) {
 			LinkProjects:  Link{"/api/v1/projects"},
 			LinkHistories: Link{"/api/v1/histories"},
 		},
-		Id:         data.IssueID,
+		Id:         id,
 		StatusCode: statusCode,
 	})
 	if err != nil {
