@@ -61,6 +61,7 @@ type RestAPIGetResponseSchema struct {
 }
 
 type RestAPIPostResponseSchema struct {
-	Id         int `json:"id"`
-	StatusCode int `json:"status_code"`
+	Links      ReferencesLinks `json:"_links"`
+	Id         int             `json:"id"`
+	StatusCode int             `json:"status_code"`
 }

@@ -183,7 +183,14 @@ func PostIssue(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	resp, err := json.Marshal(RestAPIPostResponseSchema{
-		id, statusCode,
+		Links: ReferencesLinks{
+			LinkSelf:      Link{fmt.Sprintf("/api/v1/issues/%d", id)},
+			LinkIssues:    Link{"/api/v1/issues"},
+			LinkProjects:  Link{"/api/v1/projects"},
+			LinkHistories: Link{"/api/v1/histories"},
+		},
+		Id:         id,
+		StatusCode: statusCode,
 	})
 	if err != nil {
 		log.Println(err.Error())
@@ -219,7 +226,14 @@ func PostHistory(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	resp, err := json.Marshal(RestAPIPostResponseSchema{
-		data.IssueID, statusCode,
+		Links: ReferencesLinks{
+			LinkSelf:      Link{fmt.Sprintf("/api/v1/histories/%d", data.IssueID)},
+			LinkIssues:    Link{"/api/v1/issues"},
+			LinkProjects:  Link{"/api/v1/projects"},
+			LinkHistories: Link{"/api/v1/histories"},
+		},
+		Id:         data.IssueID,
+		StatusCode: statusCode,
 	})
 	if err != nil {
 		log.Println(err.Error())
@@ -255,7 +269,14 @@ func PostProject(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	resp, err := json.Marshal(RestAPIPostResponseSchema{
-		id, statusCode,
+		Links: ReferencesLinks{
+			LinkSelf:      Link{fmt.Sprintf("/api/v1/projects/%d", id)},
+			LinkIssues:    Link{"/api/v1/issues"},
+			LinkProjects:  Link{"/api/v1/projects"},
+			LinkHistories: Link{"/api/v1/histories"},
+		},
+		Id:         id,
+		StatusCode: statusCode,
 	})
 	if err != nil {
 		log.Println(err.Error())
