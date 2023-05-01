@@ -32,13 +32,13 @@ func main() {
 	log.Printf("Create handler for mask \"%s\"", cfg.MainAPIPrefix+cfg.ResourceAPIPrefix)
 
 	resourceRouter := mux.NewRouter()
-	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"issue/{id:[0-9]+}", endpoints.GetIssue).Methods("GET")
-	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"history/{id:[0-9]+}", endpoints.GetHistory).Methods("GET")
-	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"project/{id:[0-9]+}", endpoints.GetProject).Methods("GET")
+	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"issues/{id:[0-9]+}", endpoints.GetIssue).Methods("GET")
+	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"histories/{id:[0-9]+}", endpoints.GetHistory).Methods("GET")
+	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"projects/{id:[0-9]+}", endpoints.GetProject).Methods("GET")
 
-	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"issue/{id:[0-9]+}", endpoints.PostIssue).Methods("POST")
-	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"history/{id:[0-9]+}", endpoints.PostHistory).Methods("POST")
-	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"project/{id:[0-9]+}", endpoints.PostProject).Methods("POST")
+	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"issues/", endpoints.PostIssue).Methods("POST")
+	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"histories/", endpoints.PostHistory).Methods("POST")
+	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"projects/", endpoints.PostProject).Methods("POST")
 
 	resourceAddress := fmt.Sprintf("%s:%d", cfg.ResourceHost, cfg.ResourcePort)
 

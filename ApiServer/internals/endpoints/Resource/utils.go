@@ -155,6 +155,7 @@ func GetProjectInfoByID(id int) (ProjectInfo, error) {
 		return ProjectInfo{}, err
 	}
 
+	project.ProjectID = id
 	log.Printf("GetProjectByID call")
 	return project, nil
 }
