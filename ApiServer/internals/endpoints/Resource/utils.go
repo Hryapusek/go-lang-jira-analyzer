@@ -155,6 +155,7 @@ func GetProjectInfoByID(id int) (ProjectInfo, error) {
 		return ProjectInfo{}, err
 	}
 
+	project.ProjectID = id
 	log.Printf("GetProjectByID call")
 	return project, nil
 }
@@ -179,7 +180,7 @@ func PutProjectToDB(data ProjectInfo) (int, error) {
 			") VALUES (" +
 			fmt.Sprintf("'%s'", data.Title) +
 			") RETURNING id",
-	).Scan(newID)
+	).Scan(&newID)
 
 	log.Printf("PutProjectToDB call")
 	return newID, err
