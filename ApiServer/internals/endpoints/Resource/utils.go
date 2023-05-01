@@ -44,7 +44,7 @@ func GetIssueInfoByID(id int) (IssueInfo, error) {
 			log.Fatalf("Can't connect to database.")
 		}
 	}
-	var issue IssueInfo
+	var issue = IssueInfo{}
 	err := db.QueryRow(
 		"SELECT "+
 			"projectId,"+
@@ -60,8 +60,7 @@ func GetIssueInfoByID(id int) (IssueInfo, error) {
 			"EXTRACT(EPOCH FROM updatedTime)::bigint,"+
 			"timeSpent "+
 			"FROM Issue "+
-			"WHERE id = "+
-			fmt.Sprintf("%d;", id),
+			"WHERE id = $1", id,
 	).Scan(
 		&issue.ProjectID, &issue.AuthorID, &issue.Key, &issue.Summary,
 		&issue.Description, &issue.Type, &issue.Priority, &issue.Status,
@@ -91,14 +90,13 @@ func GetAllHistoryInfoByIssueID(id int) ([]HistoryInfo, error) {
 
 	var history []HistoryInfo
 	rows, err := db.Query(
-		"SELECT " +
-			"authorId," +
-			"EXTRACT(EPOCH FROM changeTime)," +
-			"fromStatus," +
-			"toStatus " +
-			"FROM StatusChanges " +
-			"WHERE issueId = " +
-			fmt.Sprintf("%d;", id),
+		"SELECT "+
+			"authorId,"+
+			"EXTRACT(EPOCH FROM changeTime)::bigint,"+
+			"fromStatus,"+
+			"toStatus "+
+			"FROM StatusChanges "+
+			"WHERE issueId = $1", id,
 	)
 
 	if err != nil {
@@ -114,7 +112,7 @@ func GetAllHistoryInfoByIssueID(id int) ([]HistoryInfo, error) {
 	}(rows)
 
 	for rows.Next() {
-		var statusChange HistoryInfo
+		var statusChange = HistoryInfo{}
 		err := rows.Scan(&statusChange.AuthorID, &statusChange.ChangeTime, &statusChange.FromStatus, &statusChange.ToStatus)
 		if err != nil {
 			log.Printf("Error on handling query to the database: %s", err.Error())
@@ -139,13 +137,13 @@ func GetProjectInfoByID(id int) (ProjectInfo, error) {
 		}
 	}
 
-	var project ProjectInfo
+	var project = ProjectInfo{}
+
 	err := db.QueryRow(
-		"SELECT " +
-			"title " +
-			"FROM Projects " +
-			"WHERE id = " +
-			fmt.Sprintf("%d;", id),
+		"SELECT "+
+			"title "+
+			"FROM Projects "+
+			"WHERE id = $1", id,
 	).Scan(
 		&project.Title,
 	)
@@ -175,11 +173,7 @@ func PutProjectToDB(data ProjectInfo) (int, error) {
 	var newID int
 
 	err := db.QueryRow(
-		"INSERT INTO Projects (" +
-			"title" +
-			") VALUES (" +
-			fmt.Sprintf("'%s'", data.Title) +
-			") RETURNING id",
+		"INSERT INTO Projects (title) VALUES (COALESCE($1, '')) RETURNING id", data.Title,
 	).Scan(&newID)
 
 	log.Printf("PutProjectToDB call")
@@ -198,25 +192,26 @@ func PutHistoryToDB(data HistoryInfo) error {
 		}
 	}
 
-	err := db.QueryRow("INSERT INTO StatusChanges (" +
-		"issueId," +
-		"authorId," +
-		"changeTime," +
-		"fromStatus," +
-		"toStatus" +
-		") VALUES " +
-		fmt.Sprintf("("+
-			"%d,"+
-			"%d,"+
-			"to_timestamp(%d),"+
-			"'%s',"+
-			"'%s'"+
-			");", data.IssueID, data.AuthorID, data.ChangeTime, data.FromStatus, data.ToStatus,
-		),
+	err := db.QueryRow("INSERT INTO StatusChanges ("+
+		"issueId,authorId,changeTime,fromStatus,toStatus) VALUES "+
+		"($1, $2, now(), COALESCE($3, ''), COALESCE($4, ''));",
+		data.IssueID, data.AuthorID, data.FromStatus, data.ToStatus,
 	).Err()
 
+	if err != nil {
+		log.Printf("Error with creating history entry: %s", err.Error())
+		return err
+	}
+
+	err = db.QueryRow("UPDATE Issue SET status = COALESCE($1, status), updatedTime = now(), timespent = EXTRACT(EPOCH FROM now()-createdTime)::integer WHERE id = $2", data.ToStatus, data.IssueID).Err()
+
+	if err != nil {
+		log.Printf("Error with updating issue entry: %s", err.Error())
+		return err
+	}
+
 	log.Printf("PutHistoryToDB call")
-	return err
+	return nil
 }
 
 func PutIssueToDB(data IssueInfo) (int, error) {
@@ -233,39 +228,13 @@ func PutIssueToDB(data IssueInfo) (int, error) {
 
 	var newID int
 	err := db.QueryRow(
-		"INSERT INTO Issue (" +
-			"projectId," +
-			"authorId," +
-			"assigneeId," +
-			"key," +
-			"summary," +
-			"description," +
-			"type," +
-			"priority," +
-			"status," +
-			"createdTime," +
-			"closedTime," +
-			"updatedTime," +
-			"timeSpent" +
-			") VALUES (" +
-			fmt.Sprintf(
-				"%d,"+
-					"%d,"+
-					"%d,"+
-					"'%s',"+
-					"'%s',"+
-					"'%s',"+
-					"'%s',"+
-					"'%s',"+
-					"'%s',"+
-					"to_timestamp(%d),"+
-					"to_timestamp(%d),"+
-					"to_timestamp(%d),"+
-					"%d", data.ProjectID, data.AuthorID, data.AssigneeId, data.Key, data.Summary, data.Description,
-				data.Type, data.Priority, data.Status, data.CreatedTime, data.ClosedTime, data.UpdatedTime,
-				data.TimeSpent,
-			) +
+		"INSERT INTO Issue (projectId,authorId,assigneeId,key,summary,description,type,"+
+			"priority,status,createdTime,closedTime,updatedTime,timeSpent) VALUES ("+
+			"$1, $2, $3, $4, $5, $6, $7, $8, $9, to_timestamp($10), to_timestamp($11), to_timestamp($12), $13"+
 			") RETURNING id",
+		data.ProjectID, data.AuthorID, data.AssigneeId, data.Key, data.Summary, data.Description,
+		data.Type, data.Priority, data.Status, data.CreatedTime, data.ClosedTime, data.UpdatedTime,
+		data.TimeSpent,
 	).Scan(&newID)
 
 	log.Printf("PutIssueToDB call")
