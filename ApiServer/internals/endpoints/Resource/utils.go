@@ -107,7 +107,7 @@ func GetAllHistoryInfoByIssueID(id int) ([]HistoryInfo, error) {
 	rows, err := db.Query(
 		"SELECT "+
 			"authorId,"+
-			"EXTRACT(EPOCH FROM changeTime),"+
+			"EXTRACT(EPOCH FROM changeTime)::bigint,"+
 			"fromStatus,"+
 			"toStatus "+
 			"FROM StatusChanges "+

@@ -70,7 +70,7 @@ func GetHistory(rw http.ResponseWriter, r *http.Request) {
 
 	history, err := GetAllHistoryInfoByIssueID(id)
 	if err != nil {
-		log.Printf("Request ended up with mistake of database: %s", err.Error())
+		log.Printf("Request for histories ended up with mistake of database: %s", err.Error())
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
