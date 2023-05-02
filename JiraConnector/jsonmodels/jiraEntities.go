@@ -35,3 +35,23 @@ type IssueFields struct {
 	UpdatedTime string `json:"updated"`
 	ClosedTime  string `json:"resolutiondate"`
 }
+
+type IssueStatusChange struct {
+	Changelog struct {
+		Histories []History `json:"histories"`
+	} `json:"changelog"`
+}
+
+type History struct {
+	Author struct {
+		Name string `json:"name"`
+	} `json:"author"`
+	CreatedTime string `json:"created"`
+	Items       []Item
+}
+
+type Item struct {
+	Field      string `json:"field"`
+	FromString string `json:"fromString"`
+	ToString   string `json:"toString"`
+}
