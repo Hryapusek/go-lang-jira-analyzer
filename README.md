@@ -1,1 +1,0 @@
-# go-lang-jira-analyzer

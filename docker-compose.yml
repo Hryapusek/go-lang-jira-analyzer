@@ -25,6 +25,15 @@ services:
       - pgadmin-data:/var/lib/pgadmin
     links:
       - "db:dbServer"
+
+  api:
+    ports:
+      - "8000"
+    build: Api_image/
+
+  connector:
+    build: Connector_image/
+    
 volumes:
   db-data:
   pgadmin-data:
