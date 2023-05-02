@@ -18,10 +18,10 @@ connector_port: 8003
 connector_api_prefix: "/connector/"
 
 db_host: localhost
-db_port: 5432
+db_port: 49171
 db_name: testdb
 db_user: postgres
-db_passwd: password
+db_passwd: admin
 
 local_http_server_port: 8003
 local_http_server_host: localhost
