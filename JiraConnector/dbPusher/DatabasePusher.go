@@ -44,16 +44,44 @@ func NewDatabasePusher() *DatabasePusher {
 
 func (databasePusher *DatabasePusher) PushIssues(issues []jsonmodels.TransformedIssue) {
 	projectId := databasePusher.extractProjectId(issues[0].Project)
+	transaction, err := databasePusher.database.Begin()
+	if err != nil {
+		databasePusher.logger.Log(logging.ERROR, "Can not open a transaction for project="+issues[0].Project)
+		return
+	}
+
+	statement, err := transaction.Prepare("INSERT INTO \"issue\" (projectid, authorid, assigneeid, key, summary, description, type, priority, status, createdtime, closedtime, updatedtime, timespent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id")
+	if err != nil {
+		databasePusher.logger.Log(logging.ERROR, "Can not create a prepare statement for project="+issues[0].Project)
+		return
+	}
+	defer func(statement *sql.Stmt) {
+		_ = statement.Close()
+	}(statement)
 
 	for _, issue := range issues {
 		authorId := databasePusher.extractAuthorId(issue.Author)
 		assigneeId := databasePusher.extractAssigneeId(issue.Assignee)
 
-		queryString := "INSERT INTO \"issue\" (projectid, authorid, assigneeid, key, summary, description, type, priority, status, createdtime, closedtime, updatedtime, timespent) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)"
-		_, _ = databasePusher.database.Exec(queryString, projectId, authorId, assigneeId, issue.Key, issue.Summary,
+		issueId := databasePusher.extractIssueId(issue.Key)
+		if issueId != 0 {
+			databasePusher.deleteIssueById(issueId)
+		}
+
+		err = statement.QueryRow(projectId, authorId, assigneeId, issue.Key, issue.Summary,
 			issue.Description, issue.Type, issue.Priority, issue.Status, issue.CreatedTime, issue.ClosedTime,
-			issue.UpdatedTime, issue.Timespent)
+			issue.UpdatedTime, issue.Timespent).Scan(&issueId)
+		if err != nil {
+			_ = transaction.Rollback()
+			break
+		}
 	}
+
+	err = transaction.Commit()
+	if err != nil {
+		databasePusher.logger.Log(logging.ERROR, "Error while committing a transaction for project="+issues[0].Project)
+	}
+
 }
 
 func (databasePusher *DatabasePusher) extractProjectId(projectTitle string) int {
@@ -84,4 +112,14 @@ func (databasePusher *DatabasePusher) extractAssigneeId(assigneeName string) int
 	}
 
 	return assigneeId
+}
+
+func (databasePusher *DatabasePusher) extractIssueId(issueKey string) int {
+	var issueId int
+	_ = databasePusher.database.QueryRow("SELECT id FROM \"issue\" WHERE key=$1", issueKey).Scan(&issueId)
+	return issueId
+}
+
+func (databasePusher *DatabasePusher) deleteIssueById(issueId int) {
+	_, _ = databasePusher.database.Exec("DELETE FROM \"issue\" WHERE id=$1", issueId)
 }

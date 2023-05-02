@@ -50,13 +50,14 @@ func (server *Server) updateProject(writer http.ResponseWriter, request *http.Re
 	}
 
 	issues, err := server.connector.GetProjectIssues(projectName, server.configReader.GetMinTimeSleep())
-	if err == nil {
-		transformedIssues := server.dataTransformer.TransformIssues(issues)
-		server.databasePusher.PushIssues(transformedIssues)
-	} else {
+	if err != nil {
 		server.logger.Log(logging.ERROR, "Error while downloading issues for project \""+projectName+"\"")
 		writer.WriteHeader(400)
+		return
 	}
+
+	transformedIssues := server.dataTransformer.TransformIssues(issues)
+	server.databasePusher.PushIssues(transformedIssues)
 }
 
 func (server *Server) projects(writer http.ResponseWriter, request *http.Request) {
