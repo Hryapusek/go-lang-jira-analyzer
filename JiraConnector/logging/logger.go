@@ -19,8 +19,8 @@ func NewLogger() *Logger {
 	logger.SetLevel(level)
 	logger.SetFormatter(&logrus.JSONFormatter{})
 
-	logs, _ := os.OpenFile("./logs/logs.log", os.O_APPEND, 0666)
-	errors, _ := os.OpenFile("./logs/err_logs.log", os.O_APPEND, 0666)
+	logs, _ := os.OpenFile("../logs/logs.log", os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+	errors, _ := os.OpenFile("../logs/err_logs.log", os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 
 	logsFile := io.MultiWriter(logs)
 	errorLogsFile := io.MultiWriter(os.Stdout, errors)

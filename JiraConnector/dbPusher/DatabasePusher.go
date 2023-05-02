@@ -50,9 +50,9 @@ func (databasePusher *DatabasePusher) PushIssues(issues []jsonmodels.Transformed
 		return
 	}
 
-	statement, err := transaction.Prepare("INSERT INTO \"issue\" (projectid, authorid, assigneeid, key, summary, description, type, priority, status, createdtime, closedtime, updatedtime, timespent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id")
+	statement, err := transaction.Prepare("INSERT INTO \"issue\" (projectid, authorid, assigneeid, key, summary, description, type, priority, status, createdtime, closedtime, updatedtime, timespent) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id")
 	if err != nil {
-		databasePusher.logger.Log(logging.ERROR, "Can not create a prepare statement for project="+issues[0].Project)
+		databasePusher.logger.Log(logging.ERROR, "Can not create a prepare statement for project="+issues[0].Project + err.Error())
 		return
 	}
 	defer func(statement *sql.Stmt) {

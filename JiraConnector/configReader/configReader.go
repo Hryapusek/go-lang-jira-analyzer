@@ -14,7 +14,7 @@ func NewConfigReader() *ConfigReader {
 	configReader.viperReader = viper.New()
 	configReader.viperReader.SetConfigName("server")
 	configReader.viperReader.SetConfigType("yaml")
-	configReader.viperReader.AddConfigPath("../ApiServer/configs")
+	configReader.viperReader.AddConfigPath("../../ApiServer/configs")
 	if err := configReader.viperReader.ReadInConfig(); err != nil {
 		log.Fatal()
 	}
