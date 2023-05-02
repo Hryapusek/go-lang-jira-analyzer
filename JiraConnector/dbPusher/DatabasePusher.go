@@ -5,8 +5,13 @@ import (
 	"JiraConnector/jsonmodels"
 	"JiraConnector/logging"
 	"database/sql"
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
+	"strings"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -43,6 +48,7 @@ func NewDatabasePusher() *DatabasePusher {
 }
 
 func (databasePusher *DatabasePusher) PushIssues(issues []jsonmodels.TransformedIssue) {
+	httpClient := &http.Client{}
 	projectId := databasePusher.extractProjectId(issues[0].Project)
 	transaction, err := databasePusher.database.Begin()
 	if err != nil {
@@ -50,14 +56,24 @@ func (databasePusher *DatabasePusher) PushIssues(issues []jsonmodels.Transformed
 		return
 	}
 
-	statement, err := transaction.Prepare("INSERT INTO \"issue\" (projectid, authorid, assigneeid, key, summary, description, type, priority, status, createdtime, closedtime, updatedtime, timespent) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id")
+	statement, err := transaction.Prepare("INSERT INTO \"issue\" (projectid, authorid, assigneeid, key, summary, " +
+		"description, type, priority, status, createdtime, closedtime, updatedtime, timespent) VALUES ($1, $2, $3, $4, " +
+		"$5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id")
+
 	if err != nil {
-		databasePusher.logger.Log(logging.ERROR, "Can not create a prepare statement for project="+issues[0].Project + err.Error())
+		databasePusher.logger.Log(logging.ERROR, "Can not create a prepare statement for project="+issues[0].Project+err.Error())
 		return
 	}
-	defer func(statement *sql.Stmt) {
-		_ = statement.Close()
-	}(statement)
+	statusChangeStatement, err := transaction.Prepare("INSERT INTO \"statuschanges\" " +
+		"(issueid, authorid, changetime, fromstatus, tostatus) VALUES ($1, $2, $3, $4, $5)")
+
+	if err != nil {
+		databasePusher.logger.Log(logging.ERROR, "Can not create a status change prepare statement for project="+issues[0].Project+err.Error())
+		return
+	}
+
+	defer statement.Close()
+	defer statusChangeStatement.Close()
 
 	for _, issue := range issues {
 		authorId := databasePusher.extractAuthorId(issue.Author)
@@ -72,9 +88,40 @@ func (databasePusher *DatabasePusher) PushIssues(issues []jsonmodels.Transformed
 			issue.Description, issue.Type, issue.Priority, issue.Status, issue.CreatedTime, issue.ClosedTime,
 			issue.UpdatedTime, issue.Timespent).Scan(&issueId)
 		if err != nil {
+			databasePusher.logger.Log(logging.ERROR, "Can not save to DB for issue:"+issue.Key+", doing a rollback")
 			_ = transaction.Rollback()
 			break
 		}
+
+		requestString := databasePusher.configReader.GetJiraRepositoryUrl() + "/rest/api/2/issue/" + issue.Key + "?expand=changelog"
+		response, _ := httpClient.Get(requestString)
+		body, _ := io.ReadAll(response.Body)
+		var issueStatusChange jsonmodels.IssueStatusChange
+		err = json.Unmarshal(body, &issueStatusChange)
+		if err != nil {
+			databasePusher.logger.Log(logging.ERROR, "Incorrect issue status change unmarshalling for issue:"+issue.Key)
+		}
+
+		shouldBreak := false
+		for _, history := range issueStatusChange.Changelog.Histories {
+			for _, item := range history.Items {
+				if strings.Compare(item.Field, "status") == 0 {
+					createdTime, _ := time.Parse("2006-01-02T15:04:05.999-0700", history.CreatedTime)
+					statusChangeError, _ := statusChangeStatement.Exec(issueId, history.Author.Name, createdTime, item.FromString, item.ToString)
+					if statusChangeError != nil {
+						databasePusher.logger.Log(logging.ERROR, "Can not save to DB for issue:"+issue.Key+", doing a rollback")
+						_ = transaction.Rollback()
+						shouldBreak = true
+						break
+					}
+				}
+			}
+
+			if shouldBreak {
+				break
+			}
+		}
+
 	}
 
 	err = transaction.Commit()
