@@ -88,7 +88,7 @@ func (databasePusher *DatabasePusher) PushIssues(issues []jsonmodels.Transformed
 			issue.Description, issue.Type, issue.Priority, issue.Status, issue.CreatedTime, issue.ClosedTime,
 			issue.UpdatedTime, issue.Timespent).Scan(&issueId)
 		if err != nil {
-			databasePusher.logger.Log(logging.ERROR, "Can not save to DB for issue:"+issue.Key+", doing a rollback")
+			databasePusher.logger.Log(logging.ERROR, "Can not save to DB for issue:"+issue.Key+", doing a rollback. Err:" +err.Error())
 			_ = transaction.Rollback()
 			break
 		}
@@ -107,8 +107,15 @@ func (databasePusher *DatabasePusher) PushIssues(issues []jsonmodels.Transformed
 			for _, item := range history.Items {
 				if strings.Compare(item.Field, "status") == 0 {
 					createdTime, _ := time.Parse("2006-01-02T15:04:05.999-0700", history.CreatedTime)
-					statusChangeError, _ := statusChangeStatement.Exec(issueId, history.Author.Name, createdTime, item.FromString, item.ToString)
-					if statusChangeError != nil {
+
+					if databasePusher.isStatusChangePresent(issueId, createdTime) {
+						fmt.Println("Found status change")
+						break
+					}
+
+					newAuthorId := databasePusher.extractAuthorId(history.Author.Name)
+					_, err := statusChangeStatement.Exec(issueId, newAuthorId, createdTime, item.FromString, item.ToString)
+					if err != nil {
 						databasePusher.logger.Log(logging.ERROR, "Can not save to DB for issue:"+issue.Key+", doing a rollback")
 						_ = transaction.Rollback()
 						shouldBreak = true
@@ -122,6 +129,9 @@ func (databasePusher *DatabasePusher) PushIssues(issues []jsonmodels.Transformed
 			}
 		}
 
+		if shouldBreak {
+			break
+		}
 	}
 
 	err = transaction.Commit()
@@ -169,4 +179,10 @@ func (databasePusher *DatabasePusher) extractIssueId(issueKey string) int {
 
 func (databasePusher *DatabasePusher) deleteIssueById(issueId int) {
 	_, _ = databasePusher.database.Exec("DELETE FROM \"issue\" WHERE id=$1", issueId)
+}
+
+func (databasePusher *DatabasePusher) isStatusChangePresent(issueId int, createdTime time.Time) bool {
+	var count int
+	_ = databasePusher.database.QueryRow("SELECT COUNT(*) FROM \"statuschanges\" WHERE issueid=$1 AND changetime=$2", issueId, createdTime).Scan(&count)
+	return count != 0
 }
