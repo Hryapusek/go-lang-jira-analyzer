@@ -1,25 +1,27 @@
 package endpoints
 
 type IssueInfo struct {
-	IssueID     int    `json:"id,omitempty" require:"true"`
-	ProjectID   int    `json:"project_id,omitempty" require:"true"`
-	AuthorID    int    `json:"author_id,omitempty" require:"true"`
-	AssigneeId  int    `json:"assigned_id,omitempty" require:"true"`
-	Key         string `json:"key"`
-	Summary     string `json:"summary"`
-	Description string `json:"description"`
-	Type        string `json:"type"`
-	Priority    string `json:"priority"`
-	Status      string `json:"status"`
-	CreatedTime uint64 `json:"created_time"`
-	ClosedTime  uint64 `json:"closed_time"`
-	UpdatedTime uint64 `json:"updated_time"`
-	TimeSpent   uint64 `json:"timespent"`
+	IssueID           int    `json:"id,omitempty" require:"true"`
+	ProjectID         int    `json:"project_id,omitempty" require:"true"`
+	AuthorID          int    `json:"author_id,omitempty" require:"true"`
+	AssigneeId        int    `json:"assigned_id,omitempty" require:"true"`
+	Key               string `json:"key"`
+	Summary           string `json:"summary"`
+	Description       string `json:"description"`
+	Type              string `json:"type"`
+	Priority          string `json:"priority"`
+	Status            string `json:"status"`
+	CreatedTime       uint64 `json:"created_time"`
+	ClosedTime        uint64 `json:"closed_time"`
+	UpdatedTime       uint64 `json:"updated_time"`
+	TimeSpent         uint64 `json:"timespent"`
+	ChangeStatusCount int    `json:"change_status_count"`
 }
 
 type ProjectInfo struct {
-	ProjectID int    `json:"id,omitempty" require:"true"`
-	Title     string `json:"title"`
+	ProjectID   int    `json:"id,omitempty" require:"true"`
+	Title       string `json:"title,omitempty" require:"true"`
+	IssuesCount int    `json:"issues_count,omitempty" require:"true"`
 }
 
 type HistoryInfo struct {

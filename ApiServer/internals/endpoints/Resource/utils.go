@@ -47,6 +47,7 @@ func GetIssueInfoByID(id int) (IssueInfo, error) {
 	var issue = IssueInfo{}
 	err := db.QueryRow(
 		"SELECT "+
+			"id,"+
 			"projectId,"+
 			"authorId,"+
 			"key,"+
@@ -62,6 +63,7 @@ func GetIssueInfoByID(id int) (IssueInfo, error) {
 			"FROM Issue "+
 			"WHERE id = $1", id,
 	).Scan(
+		&issue.IssueID,
 		&issue.ProjectID, &issue.AuthorID, &issue.Key, &issue.Summary,
 		&issue.Description, &issue.Type, &issue.Priority, &issue.Status,
 		&issue.CreatedTime, &issue.ClosedTime, &issue.UpdatedTime, &issue.TimeSpent,
@@ -117,7 +119,7 @@ func GetAllHistoryInfoByIssueID(id int) ([]HistoryInfo, error) {
 		err := rows.Scan(&statusChange.AuthorID, &statusChange.ChangeTime, &statusChange.FromStatus, &statusChange.ToStatus)
 		if err != nil {
 			log.Printf("Error on handling query to the database: %s", err.Error())
-			return nil, err
+			return history, err
 		}
 		history = append(history, statusChange)
 	}
@@ -142,11 +144,17 @@ func GetProjectInfoByID(id int) (ProjectInfo, error) {
 
 	err := db.QueryRow(
 		"SELECT "+
-			"title "+
+			"Projects.id,"+
+			"Projects.title, "+
+			"("+
+			"SELECT COUNT(*) from Issue WHERE Issue.projectId=$1"+
+			") as issues_count "+
 			"FROM Projects "+
-			"WHERE id = $1", id,
+			"WHERE Projects.id = $1", id,
 	).Scan(
+		&project.ProjectID,
 		&project.Title,
+		&project.IssuesCount,
 	)
 
 	if err != nil {
@@ -240,4 +248,71 @@ func PutIssueToDB(data IssueInfo) (int, error) {
 
 	log.Printf("PutIssueToDB call")
 	return newID, err
+}
+
+func GetIssuesWithProjectId(projectId int, offset int, limit int) ([]IssueInfo, error) {
+	if db == nil {
+		initDB()
+	} else {
+		log.Println("Try to re-establish database connection.")
+
+		err := db.Ping()
+		if err != nil {
+			log.Fatalf("Can't connect to database.")
+		}
+	}
+
+	var issues []IssueInfo
+	rows, err := db.Query(
+		"SELECT "+
+			"Issue.id,"+
+			"Issue.projectId,"+
+			"Issue.authorId,"+
+			"Issue.key,"+
+			"Issue.summary,"+
+			"Issue.description,"+
+			"Issue.type,"+
+			"Issue.priority,"+
+			"Issue.status,"+
+			"EXTRACT(EPOCH FROM Issue.createdTime)::bigint,"+
+			"EXTRACT(EPOCH FROM Issue.closedTime)::bigint,"+
+			"EXTRACT(EPOCH FROM Issue.updatedTime)::bigint,"+
+			"Issue.timeSpent, "+
+			"(SELECT COUNT(*) FROM statuschanges WHERE statuschanges.issueId=Issue.id) AS status_changes_count "+
+			"FROM Issue "+
+			"WHERE projectId=$1 "+
+			"ORDER BY id "+
+			"LIMIT $2 OFFSET $3",
+		projectId, limit, offset,
+	)
+
+	if err != nil {
+		log.Printf("Error with querying issues with projectId = %d", projectId)
+		return issues, err
+	}
+
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+			log.Printf("Unable to Close() on rows.")
+		}
+	}(rows)
+
+	for rows.Next() {
+		var issue = IssueInfo{}
+		err := rows.Scan(
+			&issue.IssueID,
+			&issue.ProjectID, &issue.AuthorID, &issue.Key, &issue.Summary,
+			&issue.Description, &issue.Type, &issue.Priority, &issue.Status,
+			&issue.CreatedTime, &issue.ClosedTime, &issue.UpdatedTime, &issue.TimeSpent, &issue.ChangeStatusCount,
+		)
+		if err != nil {
+			log.Printf("Error on handling query to the database: %s", err.Error())
+			return issues, err
+		}
+
+		issues = append(issues, issue)
+	}
+
+	return issues, nil
 }
