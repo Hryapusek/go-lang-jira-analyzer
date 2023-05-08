@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-func GetIssue(rw http.ResponseWriter, r *http.Request) {
+func HandlerGetIssue(rw http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -45,7 +45,7 @@ func GetIssue(rw http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	data, err := json.Marshal(issueResponse)
+	data, err := json.MarshalIndent(issueResponse, "", "\t")
 	if err != nil {
 		log.Printf("Error with extracting info about issue project with id=%d", id)
 		rw.WriteHeader(400)
@@ -59,7 +59,7 @@ func GetIssue(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetHistory(rw http.ResponseWriter, r *http.Request) {
+func HandlerGetHistory(rw http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -96,7 +96,7 @@ func GetHistory(rw http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	data, err := json.Marshal(historyResponse)
+	data, err := json.MarshalIndent(historyResponse, "", "\t")
 	if err != nil {
 		log.Printf("Error with extracting info about history with id=%d", id)
 		rw.WriteHeader(400)
@@ -110,7 +110,7 @@ func GetHistory(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetProject(rw http.ResponseWriter, r *http.Request) {
+func HandlerGetProject(rw http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -139,7 +139,7 @@ func GetProject(rw http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	data, err := json.Marshal(projectResponse)
+	data, err := json.MarshalIndent(projectResponse, "", "\t")
 	if err != nil {
 		log.Printf("Error with extracting info about project with id=%d", id)
 		rw.WriteHeader(http.StatusBadRequest)
@@ -154,7 +154,7 @@ func GetProject(rw http.ResponseWriter, r *http.Request) {
 
 }
 
-func PostIssue(rw http.ResponseWriter, r *http.Request) {
+func HandlerPostIssue(rw http.ResponseWriter, r *http.Request) {
 	var data IssueInfo
 	body, err := io.ReadAll(r.Body)
 
@@ -180,7 +180,7 @@ func PostIssue(rw http.ResponseWriter, r *http.Request) {
 		statusCode = http.StatusCreated
 	}
 
-	resp, err := json.Marshal(RestAPIPostResponseSchema{
+	resp, err := json.MarshalIndent(RestAPIPostResponseSchema{
 		Links: ReferencesLinks{
 			LinkSelf:      Link{fmt.Sprintf("/api/v1/issues/%d", id)},
 			LinkIssues:    Link{"/api/v1/issues"},
@@ -189,7 +189,9 @@ func PostIssue(rw http.ResponseWriter, r *http.Request) {
 		},
 		Id:         id,
 		StatusCode: statusCode,
-	})
+	},
+		"", "\t")
+
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -199,7 +201,7 @@ func PostIssue(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func PostHistory(rw http.ResponseWriter, r *http.Request) {
+func HandlerPostHistory(rw http.ResponseWriter, r *http.Request) {
 	var data HistoryInfo
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -225,7 +227,7 @@ func PostHistory(rw http.ResponseWriter, r *http.Request) {
 		id = data.IssueID
 	}
 
-	resp, err := json.Marshal(RestAPIPostResponseSchema{
+	resp, err := json.MarshalIndent(RestAPIPostResponseSchema{
 		Links: ReferencesLinks{
 			LinkSelf:      Link{fmt.Sprintf("/api/v1/histories/%d", data.IssueID)},
 			LinkIssues:    Link{"/api/v1/issues"},
@@ -234,7 +236,9 @@ func PostHistory(rw http.ResponseWriter, r *http.Request) {
 		},
 		Id:         id,
 		StatusCode: statusCode,
-	})
+	},
+		"", "\t")
+
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -244,7 +248,7 @@ func PostHistory(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func PostProject(rw http.ResponseWriter, r *http.Request) {
+func HandlerPostProject(rw http.ResponseWriter, r *http.Request) {
 	var data ProjectInfo
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -268,7 +272,7 @@ func PostProject(rw http.ResponseWriter, r *http.Request) {
 		statusCode = http.StatusCreated
 	}
 
-	resp, err := json.Marshal(RestAPIPostResponseSchema{
+	resp, err := json.MarshalIndent(RestAPIPostResponseSchema{
 		Links: ReferencesLinks{
 			LinkSelf:      Link{fmt.Sprintf("/api/v1/projects/%d", id)},
 			LinkIssues:    Link{"/api/v1/issues"},
@@ -277,7 +281,9 @@ func PostProject(rw http.ResponseWriter, r *http.Request) {
 		},
 		Id:         id,
 		StatusCode: statusCode,
-	})
+	},
+		"", "\t")
+
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -285,4 +291,81 @@ func PostProject(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
+}
+
+func HandlerGetSomeIssues(rw http.ResponseWriter, r *http.Request) {
+	rw.WriteHeader(http.StatusNotImplemented)
+}
+
+func HandlerGetSomeProjects(rw http.ResponseWriter, r *http.Request) {
+	rw.WriteHeader(http.StatusNotImplemented)
+}
+
+func HandlerGetIssuesByProjectId(rw http.ResponseWriter, r *http.Request) {
+	projectId, err := strconv.Atoi(r.URL.Query().Get("projectId"))
+	if err != nil {
+		log.Printf("Invalid id=%s for issues request with project id.", r.URL.Query().Get("projectId"))
+		rw.WriteHeader(http.StatusBadRequest)
+	}
+
+	var offset int
+	offset, err = strconv.Atoi(r.URL.Query().Get("offset"))
+	if err != nil {
+		offset = 20
+	}
+
+	var limit int
+	limit, err = strconv.Atoi(r.URL.Query().Get("limit"))
+	if err != nil {
+		limit = 20
+	}
+
+	issues, err := GetIssuesWithProjectId(projectId, offset, limit)
+	if err != nil {
+		log.Printf("Error with database: %s", err.Error())
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	project, err := GetProjectInfoByID(projectId)
+	if err != nil {
+		log.Printf("Error on getting project info.")
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var completeResponse []RestAPIGetResponseSchema
+	for _, issue := range issues {
+		var issueResponse = RestAPIGetResponseSchema{
+			Links: ReferencesLinks{
+				LinkSelf:      Link{fmt.Sprintf("/api/v1/issues/%d", issue.IssueID)},
+				LinkIssues:    Link{"/api/v1/issues"},
+				LinkProjects:  Link{"/api/v1/projects"},
+				LinkHistories: Link{"/api/v1/histories"},
+			},
+			Info: IssueResponse{
+				IssueInfo: issue,
+				ProjectID: project,
+			},
+		}
+
+		completeResponse = append(completeResponse, issueResponse)
+	}
+
+	data, err := json.MarshalIndent(completeResponse, "", "\t")
+	if err != nil {
+		log.Printf("Error with extracting info about issues with projectId=%d", projectId)
+		rw.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	rw.WriteHeader(http.StatusOK)
+	_, err = rw.Write(data)
+	if err != nil {
+		return
+	}
+
+	log.Printf("Getting issues request by project id=%d", projectId)
+	rw.WriteHeader(http.StatusNotImplemented)
+
 }
