@@ -35,7 +35,7 @@ func initDB() {
 	}
 }
 
-func GraphOne(projectName string) []IssueForGraphOne {
+func GraphOne(projectId int) []IssueForGraphOne {
 	// Гистограмма, отражающая время, которое задачи провели в открытом состоянии (время в секундах) и только для закрытых
 	if db == nil {
 		initDB()
@@ -58,7 +58,7 @@ func GraphOne(projectName string) []IssueForGraphOne {
 			" Projects p ON p.id = i.projectId" +
 			" WHERE" +
 			" i.status IN ('Closed', 'Resolved')" +
-			fmt.Sprintf(" AND p.title = '%s'", projectName) +
+			fmt.Sprintf(" AND p.id = %d", projectId) +
 			" ORDER BY" +
 			" time_open_seconds;",
 	)
@@ -87,7 +87,7 @@ func GraphOne(projectName string) []IssueForGraphOne {
 	return issues
 }
 
-func GraphTwo(projectName string) []IssueForGraphTwo {
+func GraphTwo(projectId int) []IssueForGraphTwo {
 	// Диаграмма, демонстрирующая распределение времени по состоянию "Open" (я так понимаю отсортировать issues по открытым и времени)
 	if db == nil {
 		initDB()
@@ -110,7 +110,7 @@ func GraphTwo(projectName string) []IssueForGraphTwo {
 			" Projects p ON p.id = i.projectId" +
 			" WHERE" +
 			" i.status = 'Open'" +
-			fmt.Sprintf(" AND p.title = '%s'", projectName) +
+			fmt.Sprintf(" AND p.id = %d", projectId) +
 			" ORDER BY" +
 			" time_open_seconds",
 	)
@@ -139,7 +139,7 @@ func GraphTwo(projectName string) []IssueForGraphTwo {
 	return issues
 }
 
-func GraphThree(projectName string) []GraphThreeData {
+func GraphThree(projectId int) []GraphThreeData {
 	// Здесь строки с датой, где был создан и/или закрыт хотя бы один issue.
 	if db == nil {
 		initDB()
@@ -162,7 +162,7 @@ func GraphThree(projectName string) []GraphThreeData {
 			" JOIN" +
 			" Projects p ON p.id = i.projectId" +
 			" WHERE" +
-			fmt.Sprintf(" p.title = '%s'", projectName) +
+			fmt.Sprintf(" p.id = '%s'", projectId) +
 			" GROUP BY" +
 			" DATE(i.createdTime)" +
 			" )," +
@@ -175,7 +175,7 @@ func GraphThree(projectName string) []GraphThreeData {
 			" JOIN" +
 			" Projects p ON p.id = i.projectId" +
 			" WHERE" +
-			fmt.Sprintf(" p.title = '%s'", projectName) +
+			fmt.Sprintf(" p.id = %s", projectId) +
 			" AND i.status = 'Closed'" +
 			" GROUP BY" +
 			" DATE(i.closedTime)" +
@@ -216,7 +216,7 @@ func GraphThree(projectName string) []GraphThreeData {
 	return data
 }
 
-func GraphFour(projectName string) []GraphFourData {
+func GraphFour(projectId int) []GraphFourData {
 	// График по типу задачи (сложность видимо).
 	if db == nil {
 		initDB()
@@ -238,7 +238,7 @@ func GraphFour(projectName string) []GraphFourData {
 			" JOIN" +
 			" Projects p ON p.id = i.projectId" +
 			" WHERE" +
-			fmt.Sprintf(" p.title = '%s'", projectName) +
+			fmt.Sprintf(" p.id = %d", projectId) +
 			" GROUP BY" +
 			" i.type" +
 			" ORDER BY" +
@@ -269,7 +269,7 @@ func GraphFour(projectName string) []GraphFourData {
 	return data
 }
 
-func GraphFive(projectName string) []GraphFiveAndSixData {
+func GraphFive(projectId int) []GraphFiveAndSixData {
 	// Подсчет кол-ва задач по статусу (приоритет).
 	if db == nil {
 		initDB()
@@ -291,7 +291,7 @@ func GraphFive(projectName string) []GraphFiveAndSixData {
 			" JOIN" +
 			" Projects p ON p.id = i.projectId" +
 			" WHERE" +
-			fmt.Sprintf(" p.title = '%s' AND", projectName) +
+			fmt.Sprintf(" p.id = %d AND", projectId) +
 			" i.priority IN ('Minor', 'Major', 'Blocker', 'Critical')" +
 			" GROUP BY" +
 			" i.priority" +
@@ -323,7 +323,7 @@ func GraphFive(projectName string) []GraphFiveAndSixData {
 	return data
 }
 
-func GraphSix(projectName string) []GraphFiveAndSixData {
+func GraphSix(projectId int) []GraphFiveAndSixData {
 	// Подсчет кол-ва задач по статусу (приоретет закрытых).
 	if db == nil {
 		initDB()
@@ -345,7 +345,7 @@ func GraphSix(projectName string) []GraphFiveAndSixData {
 			" JOIN" +
 			" Projects p ON p.id = i.projectId" +
 			" WHERE" +
-			fmt.Sprintf(" p.title = '%s' AND", projectName) +
+			fmt.Sprintf(" p.id = %d AND", projectId) +
 			" i.status = 'Closed' AND" +
 			" i.priority IN ('Minor', 'Major', 'Blocker', 'Critical')" +
 			" GROUP BY" +

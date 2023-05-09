@@ -293,12 +293,45 @@ func HandlerPostProject(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func HandlerGetSomeIssues(rw http.ResponseWriter, r *http.Request) {
-	rw.WriteHeader(http.StatusNotImplemented)
-}
+func HandlerGetProjectByTitle(rw http.ResponseWriter, r *http.Request) {
+	title := r.URL.Query().Get("title")
+	if title == "" {
+		rw.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
-func HandlerGetSomeProjects(rw http.ResponseWriter, r *http.Request) {
-	rw.WriteHeader(http.StatusNotImplemented)
+	project, err := GetProjectInfoByTitle(title)
+
+	if err != nil {
+		log.Printf("Request ended up with mistake of database: %s", err.Error())
+		rw.WriteHeader(400)
+		return
+	}
+
+	var projectResponse = RestAPIGetResponseSchema{
+		Links: ReferencesLinks{
+			LinkSelf:      Link{fmt.Sprintf("/api/v1/projects/%d", project.ProjectID)},
+			LinkIssues:    Link{"/api/v1/issues"},
+			LinkProjects:  Link{"/api/v1/projects"},
+			LinkHistories: Link{"/api/v1/histories"},
+		},
+		Info: ProjectResponse{
+			ProjectInfo: project,
+		},
+	}
+
+	data, err := json.MarshalIndent(projectResponse, "", "\t")
+	if err != nil {
+		log.Printf("Error with extracting info about project with id=%d", project.ProjectID)
+		rw.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	rw.WriteHeader(http.StatusOK)
+	_, err = rw.Write(data)
+	if err != nil {
+		return
+	}
 }
 
 func HandlerGetIssuesByProjectId(rw http.ResponseWriter, r *http.Request) {

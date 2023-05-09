@@ -162,7 +162,6 @@ func GetProjectInfoByID(id int) (ProjectInfo, error) {
 		return ProjectInfo{}, err
 	}
 
-	project.ProjectID = id
 	log.Printf("GetProjectByID call")
 	return project, nil
 }
@@ -315,4 +314,35 @@ func GetIssuesWithProjectId(projectId int, offset int, limit int) ([]IssueInfo, 
 	}
 
 	return issues, nil
+}
+
+func GetProjectInfoByTitle(title string) (ProjectInfo, error) {
+	if db == nil {
+		initDB()
+	} else {
+		log.Println("Try to re-establish database connection.")
+
+		err := db.Ping()
+		if err != nil {
+			log.Fatalf("Can't connect to database.")
+		}
+	}
+
+	var projectId int
+	err := db.QueryRow(
+		"SELECT "+
+			"id "+
+			"FROM Projects "+
+			"WHERE Projects.title = $1", title,
+	).Scan(
+		&projectId,
+	)
+
+	if err != nil {
+		log.Printf("Error with querying an project with title = %s", title)
+		return ProjectInfo{}, err
+	}
+
+	log.Printf("GetProjectByID call")
+	return GetProjectInfoByID(projectId)
 }
