@@ -399,6 +399,56 @@ func HandlerGetIssuesByProjectId(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("Getting issues request by project id=%d", projectId)
-	rw.WriteHeader(http.StatusNotImplemented)
+}
 
+func HandlerGetAllProject(rw http.ResponseWriter, r *http.Request) {
+	var offset int
+	offset, err := strconv.Atoi(r.URL.Query().Get("offset"))
+	if err != nil {
+		offset = 20
+	}
+
+	var limit int
+	limit, err = strconv.Atoi(r.URL.Query().Get("limit"))
+	if err != nil {
+		limit = 20
+	}
+
+	projects, err := GetAllProjects(offset, limit)
+	if err != nil {
+		log.Printf("Error with database: %s", err.Error())
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var completeResponse []RestAPIGetResponseSchema
+	for _, project := range projects {
+		var projectResponse = RestAPIGetResponseSchema{
+			Links: ReferencesLinks{
+				LinkSelf:      Link{fmt.Sprintf("/api/v1/projects/%d")},
+				LinkIssues:    Link{"/api/v1/issues"},
+				LinkProjects:  Link{"/api/v1/projects"},
+				LinkHistories: Link{"/api/v1/histories"},
+			},
+			Info: project,
+		}
+
+		completeResponse = append(completeResponse, projectResponse)
+	}
+
+	data, err := json.MarshalIndent(completeResponse, "", "\t")
+	if err != nil {
+		log.Printf("Error with extracting info about all projects.")
+		rw.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	rw.WriteHeader(http.StatusOK)
+	_, err = rw.Write(data)
+	if err != nil {
+		return
+	}
+
+	log.Printf("Getting all projects request.")
+	rw.WriteHeader(http.StatusNotImplemented)
 }

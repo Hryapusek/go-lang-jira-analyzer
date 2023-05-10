@@ -42,6 +42,11 @@ func main() {
 		Queries("offset", "{offset?:[0-9]+}").
 		Queries("limit", "{limit?:[0-9]+}")
 
+	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"projects/", endpoints.HandlerGetAllProject).
+		Methods("GET").
+		Queries("offset", "{offset?:[0-9]+}").
+		Queries("limit", "{limit?:[0-9]+}")
+
 	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"get_project_by_title",
 		endpoints.HandlerGetProjectByTitle).Methods("GET").Queries("title", "{title}")
 
