@@ -42,10 +42,13 @@ func main() {
 		Queries("offset", "{offset?:[0-9]+}").
 		Queries("limit", "{limit?:[0-9]+}")
 
-	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"issues/{from_id:[0-9]+}-{to_id:[0-9]+}",
-		endpoints.HandlerGetSomeIssues).Methods("GET")
-	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"projects/{from_id:[0-9]+}-{to_id:[0-9]+}",
-		endpoints.HandlerGetSomeProjects).Methods("GET")
+	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"projects/", endpoints.HandlerGetAllProject).
+		Methods("GET").
+		Queries("offset", "{offset?:[0-9]+}").
+		Queries("limit", "{limit?:[0-9]+}")
+
+	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"get_project_by_title",
+		endpoints.HandlerGetProjectByTitle).Methods("GET").Queries("title", "{title}")
 
 	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"issues/", endpoints.HandlerPostIssue).Methods("POST")
 	resourceRouter.HandleFunc(cfg.MainAPIPrefix+cfg.ResourceAPIPrefix+"histories/", endpoints.HandlerPostHistory).Methods("POST")
